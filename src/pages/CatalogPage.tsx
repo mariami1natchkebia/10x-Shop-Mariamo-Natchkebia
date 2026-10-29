@@ -1,56 +1,85 @@
 import { useEffect, useState } from 'react'
-import { fetchProducts } from '../api/products.api'
+import { fetchProducts, fetchCategories, fetchProductsByCategory } from '../api/products.api'
 import ProductGrid from '../components/product/ProductGrid'
-import type { Product } from '../types/product'
+import type { Product, Category } from '../types/product'
 
 function CatalogPage() {
   const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    let ignore = false
+    fetchCategories()
+      .then((data) => setCategories(data))
+      .catch((err) => console.error('Failed to load categories', err))
+  }, [])
 
-    async function loadProfucts() {
-      try {
-        const data = await fetchProducts(12, 0)
+  useEffect(() => {
+    let ignore = false
+    setLoading(true)
+    setError(null)
+
+    const fetchCall = selectedCategory
+      ? fetchProductsByCategory(selectedCategory, 12, 0)
+      : fetchProducts(12, 0)
+
+    fetchCall
+      .then((data) => {
         if (!ignore) {
           setProducts(data.products)
           setTotal(data.total)
         }
-      } catch (err) {
+      })
+      .catch((err) => {
         if (!ignore) {
           setError(err instanceof Error ? err.message : 'Something went wrong')
         }
-      } finally {
+      })
+      .finally(() => {
         if (!ignore) {
           setLoading(false)
         }
-      }
-    }
-
-    loadProfucts()
+      })
 
     return () => {
       ignore = true
     }
-  }, [])
+  }, [selectedCategory])
 
   function handleAdd(product: Product) {
     alert(`Added to cart: ${product.title}`)
   }
 
   return (
-    <section>
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-2xl font-bold">Catalog</h1>
-        {!loading && !error && <p className="text-sm opacity-70">{total} products</p>}
+    <section className="container mx-auto px-4 py-6">
+      <div className="mb-6 flex flex-wrap items-baseline justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Catalog</h1>
+          {!loading && !error && <p className="text-sm text-gray-500 dark:text-gray-400">{total} products</p>}
+        </div>
+
+        <div className="w-full sm:w-64">
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-[#3b4d3c] focus:outline-none dark:border-emerald-500/20 dark:bg-[#243629] dark:text-gray-100"
+          >
+            <option value="">All categories</option>
+            {categories.map((cat) => (
+              <option key={cat.slug} value={cat.slug}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {loading && (
         <div className="flex min-h-[40vh] items-center justify-center">
-          <p role="status" className="text-base bg-emerald-100 p-10 rounded-lg font-medium text-emerald-800 dark:text-emerald-400 animate-pulse">
+          <p role="status" className="animate-pulse text-base font-medium text-emerald-800 dark:text-emerald-400">
             Loading products...
           </p>
         </div>
@@ -62,7 +91,17 @@ function CatalogPage() {
         </p>
       )}
 
-      {!loading && !error && products.length === 0 && <p>No products found.</p>}
+      {!loading && !error && products.length === 0 && (
+        <div className="py-12 text-center">
+          <p className="mb-2 text-gray-600 dark:text-gray-400">No products found.</p>
+          <button
+            onClick={() => setSelectedCategory('')}
+            className="text-sm font-medium text-emerald-700 underline hover:text-emerald-800 dark:text-emerald-400"
+          >
+            Clear filters
+          </button>
+        </div>
+      )}
 
       {!loading && !error && products.length > 0 && (
         <ProductGrid products={products} onAdd={handleAdd} />

@@ -21,3 +21,12 @@ export async function fetchCategories(): Promise<Category[]> {
   return (await response.json()) as Category[]
 }
 
+export async function fetchProductsByCategory(categorySlug: string, limit = 12, skip = 0): Promise<ProductsResponse> {
+  const response = await fetch(`${BASE_URL}/products/category/${categorySlug}?limit=${limit}&skip=${skip}`)
+
+  if (!response.ok) {
+    throw new Error(`Failed to load category products (status ${response.status})`)
+  }
+
+  return (await response.json()) as ProductsResponse
+}

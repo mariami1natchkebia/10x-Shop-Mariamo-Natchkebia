@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fetchProducts, fetchCategories, fetchProductsByCategory } from '../api/products.api'
 import ProductGrid from '../components/product/ProductGrid'
+import CategorySelect from '../components/ui/CategorySelect'
 import type { Product, Category } from '../types/product'
 
 function CatalogPage() {
@@ -55,25 +56,23 @@ function CatalogPage() {
 
   return (
     <section className="container mx-auto px-4 py-6">
-      <div className="mb-6 flex flex-wrap items-baseline justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Catalog</h1>
-          {!loading && !error && <p className="text-sm text-gray-500 dark:text-gray-400">{total} products</p>}
-        </div>
+      <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
+        <h1 className="text-2xl font-bold">Catalog</h1>
 
-        <div className="w-full sm:w-64">
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-[#3b4d3c] focus:outline-none dark:border-emerald-500/20 dark:bg-[#243629] dark:text-gray-100"
-          >
-            <option value="">All categories</option>
-            {categories.map((cat) => (
-              <option key={cat.slug} value={cat.slug}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+        <div className="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
+          <div className="w-full sm:w-72">
+            <CategorySelect
+              value={selectedCategory}
+              onChange={setSelectedCategory}
+              categories={categories}
+            />
+          </div>
+
+          {!loading && !error && (
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
+              {total} products
+            </span>
+          )}
         </div>
       </div>
 

@@ -33,3 +33,19 @@ export interface Category {
   name: string
   url: string
 }
+
+
+export type ProductDetails = Product & {
+  description: string
+  brand?: string
+  sku?: string
+  tags?: string[]
+  images: string[]
+  rating: number
+  stock: number
+  availabilityStatus?: string
+  warrantyInformation?: string
+  shippingInformation?: string
+  returnPolicy?: string
+  reviews?: Review[]
+}

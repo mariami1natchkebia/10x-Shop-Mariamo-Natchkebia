@@ -78,7 +78,7 @@ function CatalogPage() {
 
       {loading && (
         <div className="flex min-h-[40vh] items-center justify-center">
-          <p role="status" className="animate-pulse text-base font-medium text-emerald-800 dark:text-emerald-400">
+          <p role="status" className="animate-pulse bg-emerald-200/20 rounded-lg p-8 text-base font-medium text-emerald-800 dark:text-emerald-400">
             Loading products...
           </p>
         </div>

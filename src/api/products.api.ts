@@ -1,4 +1,4 @@
-import type { ProductsResponse, Category } from '../types/product'
+import type { Category, ProductDetails, ProductsResponse } from '../types/product'
 const BASE_URL = 'https://dummyjson.com'
 
 export async function fetchProducts(limit = 12, skip = 0): Promise<ProductsResponse> {
@@ -29,4 +29,16 @@ export async function fetchProductsByCategory(categorySlug: string, limit = 12, 
   }
 
   return (await response.json()) as ProductsResponse
+}
+  
+  export async function fetchProductById(id: string): Promise<ProductDetails | null> {
+  const response = await fetch(`${BASE_URL}/products/${id}`)
+
+  if (response.status === 404) return null
+
+  if (!response.ok) {
+    throw new Error(`Failed to load product (status ${response.status})`)
+  }
+
+  return (await response.json()) as ProductDetails
 }

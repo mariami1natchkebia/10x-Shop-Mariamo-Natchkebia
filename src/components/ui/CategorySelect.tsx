@@ -91,8 +91,7 @@ function CategorySelect({ value, onChange, categories }: Props) {
         <ul
           role="listbox"
           className="absolute left-0 right-0 z-50 mt-2 max-h-72 overflow-y-auto rounded-lg border-[1.5px] border-[oklch(0.45_0.16_153.68)] bg-emerald-50 p-1.5 shadow-lg shadow-emerald-900/10 dark:bg-[#243629]
-            [scrollbar-width:thin] [scrollbar-color:oklch(0.45_0.16_153.68)_transparent]
-            hover:bg-emerald-700"
+            [scrollbar-width:thin] [scrollbar-color:oklch(0.45_0.16_153.68)_transparent]"
         >
           {options.map((opt, i) => {
             const isSelected = opt.slug === value

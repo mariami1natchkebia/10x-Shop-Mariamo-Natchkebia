@@ -2,11 +2,16 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { discountedPrice, formatPrice } from '../utils/format'
+import { FREE_SHIPPING_FROM, getShippingCost } from '../utils/orders'
 
 function CartPage() {
   const navigate = useNavigate()
   const { items, totalQuantity, subtotal, setQuantity, removeItem, clearCart } = useCart()
   const [confirmingClear, setConfirmingClear] = useState(false)
+
+  const shippingCost = getShippingCost(subtotal)
+  const total = subtotal + shippingCost
+  const remainingForFree = FREE_SHIPPING_FROM - subtotal
 
   function handleConfirmClear() {
     clearCart()
@@ -152,11 +157,21 @@ function CartPage() {
               <dt className="text-gray-600 dark:text-gray-400">Subtotal</dt>
               <dd>{formatPrice(subtotal)}</dd>
             </div>
+            <div className="flex justify-between">
+              <dt className="text-gray-600 dark:text-gray-400">Shipping</dt>
+              <dd>{shippingCost === 0 ? 'Free' : formatPrice(shippingCost)}</dd>
+            </div>
             <div className="flex justify-between border-t border-gray-200 pt-2 text-base font-bold dark:border-gray-600">
               <dt>Total</dt>
-              <dd>{formatPrice(subtotal)}</dd>
+              <dd>{formatPrice(total)}</dd>
             </div>
           </dl>
+
+          {shippingCost > 0 && (
+            <p className="mt-3 text-xs text-gray-600 dark:text-gray-400">
+              Add {formatPrice(remainingForFree)} more for free shipping.
+            </p>
+          )}
 
           <button
             type="button"

@@ -2,15 +2,25 @@ import { useEffect, useState } from 'react'
 import { fetchProducts, fetchCategories, fetchProductsByCategory } from '../api/products.api'
 import ProductGrid from '../components/product/ProductGrid'
 import CategorySelect from '../components/ui/CategorySelect'
+import Toast from '../components/ui/Toast'
+import { useCart } from '../context/CartContext'
 import type { Product, Category } from '../types/product'
 
+interface Notice {
+  id: number
+  text: string
+  ok: boolean
+}
+
 function CatalogPage() {
+  const { addItem } = useCart()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<Notice | null>(null)
 
   useEffect(() => {
     fetchCategories()
@@ -50,8 +60,15 @@ function CatalogPage() {
     }
   }, [selectedCategory])
 
+  useEffect(() => {
+    if (!notice) return
+    const timer = setTimeout(() => setNotice(null), 2500)
+    return () => clearTimeout(timer)
+  }, [notice])
+
   function handleAdd(product: Product) {
-    alert(`Added to cart: ${product.title}`)
+    const result = addItem(product, 1)
+    setNotice({ id: Date.now(), text: result.message, ok: result.ok })
   }
 
   return (
@@ -78,7 +95,7 @@ function CatalogPage() {
 
       {loading && (
         <div className="flex min-h-[40vh] items-center justify-center">
-          <p role="status" className="animate-pulse bg-emerald-200/20 rounded-lg p-8 text-base font-medium text-emerald-800 dark:text-emerald-400">
+          <p role="status" className="animate-pulse text-base font-medium text-emerald-800 dark:text-emerald-400">
             Loading products...
           </p>
         </div>
@@ -105,6 +122,8 @@ function CatalogPage() {
       {!loading && !error && products.length > 0 && (
         <ProductGrid products={products} onAdd={handleAdd} />
       )}
+
+      {notice && <Toast key={notice.id} message={notice.text} ok={notice.ok} />}
     </section>
   )
 }

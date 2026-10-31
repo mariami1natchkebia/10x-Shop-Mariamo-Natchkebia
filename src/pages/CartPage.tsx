@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { discountedPrice, formatPrice } from '../utils/format'
@@ -5,11 +6,11 @@ import { discountedPrice, formatPrice } from '../utils/format'
 function CartPage() {
   const navigate = useNavigate()
   const { items, totalQuantity, subtotal, setQuantity, removeItem, clearCart } = useCart()
+  const [confirmingClear, setConfirmingClear] = useState(false)
 
-  function handleClear() {
-    if (window.confirm('Clear the cart? This cannot be undone.')) {
-      clearCart()
-    }
+  function handleConfirmClear() {
+    clearCart()
+    setConfirmingClear(false)
   }
 
   if (items.length === 0) {
@@ -32,7 +33,6 @@ function CartPage() {
       <h1 className="mb-6 text-2xl font-bold">Cart</h1>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
-        {/* Items */}
         <div>
           <ul className="space-y-3">
             {items.map((item) => {
@@ -103,16 +103,43 @@ function CartPage() {
             })}
           </ul>
 
-          <button
-            type="button"
-            onClick={handleClear}
-            className="mt-4 text-sm font-medium text-gray-600 underline hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
-          >
-            Clear cart
-          </button>
+          <div className="mt-4 min-h-[36px]">
+            {confirmingClear ? (
+              <div
+                role="alertdialog"
+                aria-label="Confirm clearing the cart"
+                className="flex flex-wrap items-center gap-3 text-sm"
+              >
+                <span className="font-medium text-red-600 dark:text-red-400">
+                  Remove all items from the cart?
+                </span>
+                <button
+                  type="button"
+                  onClick={handleConfirmClear}
+                  className="rounded-lg bg-red-600 px-3 py-1.5 font-semibold text-white transition-colors hover:bg-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                >
+                  Yes, clear
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmingClear(false)}
+                  className="rounded-lg border border-gray-300 px-3 py-1.5 font-medium transition-colors hover:bg-emerald-50 dark:border-gray-600 dark:hover:bg-[#2f4a36]"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmingClear(true)}
+                className="text-sm font-medium text-gray-600 underline hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+              >
+                Clear cart
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Summary */}
         <aside className="h-fit rounded-lg border border-gray-200 bg-emerald-50 p-4 dark:border-emerald-500/20 dark:bg-[#243629]">
           <h2 className="mb-3 text-lg font-bold">Summary</h2>
 

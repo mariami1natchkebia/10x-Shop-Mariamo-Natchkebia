@@ -3,17 +3,27 @@ import { Link, useParams } from 'react-router-dom'
 import { fetchProductById } from '../api/products.api'
 import type { ProductDetails } from '../types/product'
 import { discountedPrice, formatPrice } from '../utils/format'
+import { useCart } from '../context/CartContext'
 import NotFoundPage from './NotFoundPage'
+import Toast from '../components/ui/Toast'
 
 const VALID_ID = /^[1-9]\d*$/
 
+interface Notice {
+  id: number
+  text: string
+  ok: boolean
+}
+
 function ProductPage() {
   const { id } = useParams<{ id: string }>()
+  const { addItem } = useCart()
   const [product, setProduct] = useState<ProductDetails | null>(null)
   const [activeImage, setActiveImage] = useState(0)
   const [qty, setQty] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<Notice | null>(null)
 
   const isValidId = !!id && VALID_ID.test(id)
 
@@ -24,6 +34,7 @@ function ProductPage() {
     setError(null)
     setActiveImage(0)
     setQty(1)
+    setNotice(null)
 
     fetchProductById(id)
       .then((data) => {
@@ -41,15 +52,24 @@ function ProductPage() {
     }
   }, [id])
 
+  useEffect(() => {
+    if (!notice) return
+    const timer = setTimeout(() => setNotice(null), 2500)
+    return () => clearTimeout(timer)
+  }, [notice])
+
   if (!isValidId) return <NotFoundPage />
 
   if (loading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-          <p role="status" className="animate-pulse bg-emerald-200/20 rounded-lg p-8 text-base font-medium text-emerald-800 dark:text-emerald-400">
-            Loading products...
-          </p>
-        </div>
+        <p
+          role="status"
+          className="animate-pulse rounded-lg bg-emerald-200/20 p-8 text-base font-medium text-emerald-800 dark:text-emerald-400"
+        >
+          Loading products...
+        </p>
+      </div>
     )
   }
 
@@ -71,6 +91,12 @@ function ProductPage() {
   const hasDiscount = product.discountPercentage >= 1
   const finalPrice = discountedPrice(product.price, product.discountPercentage)
   const inStock = product.stock > 0
+
+  function handleAddToCart() {
+    if (!product) return
+    const result = addItem(product, qty)
+    setNotice({ id: Date.now(), text: result.message, ok: result.ok })
+  }
 
   return (
     <section className="container mx-auto px-4 py-6">
@@ -111,16 +137,16 @@ function ProductPage() {
         </div>
 
         <div>
-          <p className="text-sm text-gray-500 capitalize dark:text-gray-400">
+          <p className="text-sm capitalize text-gray-500 dark:text-gray-400">
             {product.category}
             {product.brand && ` · ${product.brand}`}
           </p>
           <h1 className="mt-1 text-2xl font-bold">{product.title}</h1>
 
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            ★ {product.rating.toFixed(1)}
-          </p>
-
+          <p className="mt-2 flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
+            <StarIcon />
+            <span>{product.rating.toFixed(1)}</span>
+        </p>
           <div className="mt-4 flex items-baseline gap-3">
             <span className="text-3xl font-bold">{formatPrice(finalPrice)}</span>
             {hasDiscount && (
@@ -174,7 +200,7 @@ function ProductPage() {
           <button
             type="button"
             disabled={!inStock}
-            onClick={() => alert(`Added to cart: ${product.title} × ${qty}`)}
+            onClick={handleAddToCart}
             className="mt-4 w-full rounded-lg bg-[#3b4d3c] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#2f3e30] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b4d3c] disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600 sm:w-auto"
           >
             {inStock ? 'Add to cart' : 'Out of stock'}
@@ -190,24 +216,34 @@ function ProductPage() {
       </div>
 
       {product.reviews && product.reviews.length > 0 && (
-        <div className="mt-12">
-          <h2 className="mb-4 text-xl font-bold">Reviews ({product.reviews.length})</h2>
-          <ul className="space-y-3">
-            {product.reviews.map((r) => (
-              <li
-                key={`${r.reviewerName}-${r.date}`}
-                className="rounded-lg bg-emerald-50 p-4 dark:bg-[#243629]"
-              >
-                <div className="flex justify-between text-sm">
-                  <span className="font-semibold">{r.reviewerName}</span>
-                  <span aria-label={`${r.rating} out of 5`}>{'★'.repeat(r.rating)}</span>
-                </div>
-                <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{r.comment}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+    <div className="mt-12">
+        <h2 className="mb-4 text-xl font-bold">Reviews ({product.reviews.length})</h2>
+        <ul className="space-y-3">
+        {product.reviews.map((r) => (
+            <li
+            key={`${r.reviewerName}-${r.date}`}
+            className="rounded-lg bg-emerald-50 p-4 dark:bg-[#243629]"
+            >
+            <div className="flex justify-between text-sm">
+                <span className="font-semibold">{r.reviewerName}</span>
+                <span
+                role="img"
+                aria-label={`${r.rating} out of 5`}
+                className="flex items-center gap-0.5"
+                >
+                {Array.from({ length: r.rating }, (_, i) => (
+                    <StarIcon key={i} className="h-3.5 w-3.5" />
+                ))}
+                </span>
+            </div>
+            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{r.comment}</p>
+            </li>
+        ))}
+        </ul>
+    </div>
+    )}
+
+      {notice && <Toast key={notice.id} message={notice.text} ok={notice.ok} />}
     </section>
   )
 }
@@ -218,6 +254,24 @@ function Row({ label, value }: { label: string; value: string }) {
       <dt className="w-24 shrink-0 font-medium text-gray-500 dark:text-gray-400">{label}</dt>
       <dd>{value}</dd>
     </div>
+  )
+}
+
+function StarIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 360 360"
+      className={`shrink-0 ${className}`}
+      aria-hidden="true"
+    >
+      <path
+        fill="#189509"
+        stroke="#09500C"
+        strokeWidth="25"
+        d="m203.8 43.5 20.2 62.1a25 25 0 0 0 23.8 17.3h65.3a25 25 0 0 1 14.7 45.2L275 206.5a25 25 0 0 0-9.1 28l20.2 62.1a25 25 0 0 1-38.5 28l-52.8-38.4a25 25 0 0 0-29.4 0l-52.8 38.4a25 25 0 0 1-38.5-28l20.2-62.1a25 25 0 0 0-9.1-28l-52.8-38.4a25 25 0 0 1 14.7-45.2h65.3c10.8 0 20.4-7 23.8-17.3l20.2-62.1a25 25 0 0 1 47.6 0Z"
+      />
+    </svg>
   )
 }
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
-
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false)
@@ -10,15 +10,23 @@ function Header() {
   })
 
   const { totalQuantity } = useCart()
+  const { isLoggedIn, logout } = useAuth()
+  const navigate = useNavigate()
 
-    const cartBadge = totalQuantity > 0 && (
+  function handleLogout() {
+    logout()
+    setIsOpen(false)
+    navigate('/')
+  }
+
+  const cartBadge = totalQuantity > 0 && (
     <span
-        aria-label={`${totalQuantity} items in cart`}
-        className="ml-1.5 rounded-full bg-[#3b4d3c] px-1.5 py-0.5 text-xs font-semibold text-white dark:bg-[#a8e6cf] dark:text-[#3b4d3c]"
+      aria-label={`${totalQuantity} items in cart`}
+      className="ml-1.5 rounded-full bg-[#3b4d3c] px-1.5 py-0.5 text-xs font-semibold text-white dark:bg-[#a8e6cf] dark:text-[#3b4d3c]"
     >
-        {totalQuantity}
+      {totalQuantity}
     </span>
-    )
+  )
 
   useEffect(() => {
     if (isDark) {
@@ -84,9 +92,14 @@ function Header() {
         </Link>
 
         <div className="hidden items-center gap-2 text-sm font-medium sm:flex sm:gap-4 sm:text-base">
-            <Link to="/" className={linkClass}>Catalog</Link>
-            <Link to="/cart" className={linkClass}>Cart{cartBadge}</Link>          <Link to="/login" className={linkClass}>Log in</Link>
-            {themeToggle}
+          <Link to="/" className={linkClass}>Catalog</Link>
+          <Link to="/cart" className={linkClass}>Cart{cartBadge}</Link>
+          {isLoggedIn ? (
+            <button type="button" onClick={handleLogout} className={linkClass}>Log out</button>
+          ) : (
+            <Link to="/login" className={linkClass}>Log in</Link>
+          )}
+          {themeToggle}
         </div>
 
         <div className="flex items-center gap-2 sm:hidden">
@@ -115,12 +128,17 @@ function Header() {
         </div>
       </nav>
 
-        {isOpen && (
-            <div className="absolute left-0 top-full z-50 flex w-full flex-col border-b border-emerald-900/10 bg-[#a8e6cf] px-6 py-4 shadow-md dark:border-emerald-500/20 dark:bg-[#3b4d3c] sm:hidden">
-                <Link to="/" onClick={() => setIsOpen(false)} className={mobileLinkClass}>Catalog</Link>
-                <Link to="/cart" onClick={() => setIsOpen(false)} className={mobileLinkClass}>Cart{cartBadge}</Link>          <Link to="/login" onClick={() => setIsOpen(false)} className={mobileLinkClass}>Log in</Link>
-            </div>
-        )}
+      {isOpen && (
+        <div className="absolute left-0 top-full z-50 flex w-full flex-col border-b border-emerald-900/10 bg-[#a8e6cf] px-6 py-4 shadow-md dark:border-emerald-500/20 dark:bg-[#3b4d3c] sm:hidden">
+          <Link to="/" onClick={() => setIsOpen(false)} className={mobileLinkClass}>Catalog</Link>
+          <Link to="/cart" onClick={() => setIsOpen(false)} className={mobileLinkClass}>Cart{cartBadge}</Link>
+          {isLoggedIn ? (
+            <button type="button" onClick={handleLogout} className={mobileLinkClass}>Log out</button>
+          ) : (
+            <Link to="/login" onClick={() => setIsOpen(false)} className={mobileLinkClass}>Log in</Link>
+          )}
+        </div>
+      )}
     </header>
   )
 }

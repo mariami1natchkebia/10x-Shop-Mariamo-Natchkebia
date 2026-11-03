@@ -1,7 +1,142 @@
+
 @import "tailwindcss";
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 
 
+@theme {
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-light: var(--brand-light);
 
- 
+  --color-accent-pink: var(--accent-pink);
+  --color-accent-yellow: var(--accent-yellow);
+
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-secondary: var(--surface-secondary);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+
+  --color-border: var(--border);
+  --color-border-hover: var(--border-hover);
+
+  --color-success: var(--success);
+  --color-error: var(--error);
+}
+
+
+
+:root {
+  --brand: #A9BB8C;
+  --brand-dark: #849B68;
+  --brand-light: #E7EDDD;
+
+  --accent-pink: #E8B6BC;
+  --accent-yellow: #EBD8A9;
+
+  --background: #F7F8F5;
+  --surface: #FFFFFF;
+  --surface-secondary: #EEF1E9;
+
+  --text-primary: #354137;
+  --text-secondary: #788176;
+
+  --border: #E3E8DF;
+  --border-hover: #C7D1BD;
+
+  --success: #71966F;
+  --error: #CF7777;
+
+  --shadow-color: 53 65 55;
+}
+
+
+
+.dark {
+  --brand: #B5C69A;
+  --brand-dark: #9BAC81;
+  --brand-light: #465344;
+
+  --accent-pink: #D9A5AD;
+  --accent-yellow: #DCC795;
+
+  --background: #303934;
+  --surface: #39443D;
+  --surface-secondary: #424E45;
+
+  --text-primary: #F0F2EB;
+  --text-secondary: #B3BDB2;
+
+  --border: #4D5A50;
+  --border-hover: #697868;
+
+
+  --success: #A2C69A;
+  --error: #E49A9A;
+
+  --shadow-color: 0 0 0;
+}
+
+
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--text-primary);
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  ::selection {
+    background-color: var(--brand-light);
+    color: var(--text-primary);
+  }
+
+  button,
+  a {
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+}
+
+
+
+@layer components {
+  .card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    box-shadow: 0 2px 12px rgb(var(--shadow-color) / 0.04);
+  }
+
+  .btn-primary {
+    background-color: var(--brand);
+    color: #354137;
+    border-radius: 0.75rem;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--brand-dark);
+    color: #FFFFFF;
+  }
+
+  .btn-secondary {
+    background-color: var(--surface-secondary);
+    color: var(--text-primary);
+    border-radius: 0.75rem;
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--brand-light);
+  }
+}

@@ -17,7 +17,7 @@ export function validateShipping(values: ShippingInfo): ShippingErrors {
     errors.email = 'Please enter a valid email address'
   }
 
-  if (!PHONE_PATTERN.test(values.phone.replace(/\s/g, ''))) {
+  if (!PHONE_PATTERN.test(values.phone.replace(/[\s-]/g, ''))) {
     errors.phone = 'Please enter a valid phone number'
   }
 

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react'
 import { fetchProducts, fetchCategories, fetchProductsByCategory } from '../api/products.api'
 import ProductGrid from '../components/product/ProductGrid'
@@ -74,7 +75,7 @@ function CatalogPage() {
   return (
     <section className="container mx-auto px-4 py-6">
       <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
-        <h1 className="text-2xl font-bold">Catalog</h1>
+        <h1 className="text-2xl font-bold text-text-primary">Catalog</h1>
 
         <div className="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
           <div className="w-full sm:w-72">
@@ -86,8 +87,8 @@ function CatalogPage() {
           </div>
 
           {!loading && !error && (
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
-              {total} products
+            <span className="whitespace-nowrap text-sm font-medium text-text-secondary">
+              Showing {products.length} of {total} products
             </span>
           )}
         </div>
@@ -95,24 +96,28 @@ function CatalogPage() {
 
       {loading && (
         <div className="flex min-h-[40vh] items-center justify-center">
-          <p role="status" className="animate-pulse text-base font-medium text-emerald-800 dark:text-emerald-400">
+          <p
+            role="status"
+            className="animate-pulse text-base font-medium text-brand-dark"
+          >
             Loading products...
           </p>
         </div>
       )}
 
       {error && (
-        <p role="alert" className="text-red-600 dark:text-red-400">
+        <p role="alert" className="text-error">
           {error}
         </p>
       )}
 
       {!loading && !error && products.length === 0 && (
         <div className="py-12 text-center">
-          <p className="mb-2 text-gray-600 dark:text-gray-400">No products found.</p>
+          <p className="mb-2 text-text-secondary">No products found.</p>
           <button
+            type="button"
             onClick={() => setSelectedCategory('')}
-            className="text-sm font-medium text-emerald-700 underline hover:text-emerald-800 dark:text-emerald-400"
+            className="min-h-11 text-sm font-medium text-brand-dark underline hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
             Clear filters
           </button>

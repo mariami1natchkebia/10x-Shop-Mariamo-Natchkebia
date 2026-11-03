@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
@@ -21,11 +22,11 @@ function CartPage() {
   if (items.length === 0) {
     return (
       <section className="container mx-auto px-4 py-12 text-center">
-        <h1 className="mb-3 text-2xl font-bold">Cart</h1>
-        <p className="mb-4 text-gray-600 dark:text-gray-400">Your cart is empty.</p>
+        <h1 className="mb-3 text-2xl font-bold text-text-primary">Cart</h1>
+        <p className="mb-4 text-text-secondary">Your cart is empty.</p>
         <Link
           to="/"
-          className="inline-block rounded-lg bg-[#3b4d3c] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#2f3e30] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b4d3c]"
+          className="inline-flex min-h-11 items-center rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
         >
           Browse products
         </Link>
@@ -35,7 +36,7 @@ function CartPage() {
 
   return (
     <section className="container mx-auto px-4 py-6">
-      <h1 className="mb-6 text-2xl font-bold">Cart</h1>
+      <h1 className="mb-6 text-2xl font-bold text-text-primary">Cart</h1>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
         <div>
@@ -46,7 +47,7 @@ function CartPage() {
               return (
                 <li
                   key={item.productId}
-                  className="flex flex-col gap-3 rounded-lg border border-gray-200 bg-white p-3 sm:flex-row sm:items-center dark:border-emerald-500/20 dark:bg-[#243629]"
+                  className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-3 sm:flex-row sm:items-center"
                 >
                   <img
                     src={item.thumbnail}
@@ -54,17 +55,17 @@ function CartPage() {
                     width={80}
                     height={80}
                     loading="lazy"
-                    className="h-20 w-20 shrink-0 rounded-md bg-gray-50 object-contain p-1 dark:bg-[#1b2e23]"
+                    className="h-20 w-20 shrink-0 rounded-md bg-surface-secondary object-contain p-1"
                   />
 
                   <div className="min-w-0 flex-1">
                     <Link
                       to={`/products/${item.productId}`}
-                      className="font-semibold hover:underline"
+                      className="font-semibold text-text-primary hover:underline"
                     >
                       {item.title}
                     </Link>
-                    <p className="mt-0.5 text-sm text-gray-600 dark:text-gray-400">
+                    <p className="mt-0.5 text-sm text-text-secondary">
                       {formatPrice(unitPrice)} each
                     </p>
                   </div>
@@ -75,11 +76,11 @@ function CartPage() {
                       onClick={() => setQuantity(item.productId, item.quantity - 1)}
                       disabled={item.quantity <= 1}
                       aria-label={`Decrease quantity of ${item.title}`}
-                      className="h-9 w-9 rounded-lg border border-gray-300 transition-colors hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-600 dark:hover:bg-[#2f4a36]"
+                      className="h-11 w-11 rounded-lg border border-border text-text-primary transition-colors hover:bg-surface-secondary disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       −
                     </button>
-                    <span className="w-8 text-center font-semibold" aria-live="polite">
+                    <span className="w-8 text-center font-semibold text-text-primary" aria-live="polite">
                       {item.quantity}
                     </span>
                     <button
@@ -87,18 +88,18 @@ function CartPage() {
                       onClick={() => setQuantity(item.productId, item.quantity + 1)}
                       disabled={item.quantity >= item.stock}
                       aria-label={`Increase quantity of ${item.title}`}
-                      className="h-9 w-9 rounded-lg border border-gray-300 transition-colors hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-600 dark:hover:bg-[#2f4a36]"
+                      className="h-11 w-11 rounded-lg border border-border text-text-primary transition-colors hover:bg-surface-secondary disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       +
                     </button>
                   </div>
 
                   <div className="flex items-center justify-between gap-4 sm:w-32 sm:flex-col sm:items-end sm:gap-1">
-                    <span className="font-bold">{formatPrice(unitPrice * item.quantity)}</span>
+                    <span className="font-bold text-text-primary">{formatPrice(unitPrice * item.quantity)}</span>
                     <button
                       type="button"
                       onClick={() => removeItem(item.productId)}
-                      className="text-sm font-medium text-red-600 hover:underline dark:text-red-400"
+                      className="min-h-11 text-sm font-medium text-error hover:underline"
                     >
                       Remove
                     </button>
@@ -108,27 +109,27 @@ function CartPage() {
             })}
           </ul>
 
-          <div className="mt-4 min-h-[36px]">
+          <div className="mt-4 min-h-[44px]">
             {confirmingClear ? (
               <div
                 role="alertdialog"
                 aria-label="Confirm clearing the cart"
                 className="flex flex-wrap items-center gap-3 text-sm"
               >
-                <span className="font-medium text-red-600 dark:text-red-400">
+                <span className="font-medium text-error">
                   Remove all items from the cart?
                 </span>
                 <button
                   type="button"
                   onClick={handleConfirmClear}
-                  className="rounded-lg bg-red-600 px-3 py-1.5 font-semibold text-white transition-colors hover:bg-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                  className="min-h-11 rounded-lg bg-error px-3 py-1.5 font-semibold text-white transition-colors hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error"
                 >
                   Yes, clear
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmingClear(false)}
-                  className="rounded-lg border border-gray-300 px-3 py-1.5 font-medium transition-colors hover:bg-emerald-50 dark:border-gray-600 dark:hover:bg-[#2f4a36]"
+                  className="min-h-11 rounded-lg border border-border px-3 py-1.5 font-medium text-text-primary transition-colors hover:bg-surface-secondary"
                 >
                   Cancel
                 </button>
@@ -137,7 +138,7 @@ function CartPage() {
               <button
                 type="button"
                 onClick={() => setConfirmingClear(true)}
-                className="text-sm font-medium text-gray-600 underline hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+                className="min-h-11 text-sm font-medium text-text-secondary underline hover:text-error"
               >
                 Clear cart
               </button>
@@ -145,30 +146,30 @@ function CartPage() {
           </div>
         </div>
 
-        <aside className="h-fit rounded-lg border border-gray-200 bg-emerald-50 p-4 dark:border-emerald-500/20 dark:bg-[#243629]">
-          <h2 className="mb-3 text-lg font-bold">Summary</h2>
+        <aside className="h-fit rounded-lg border border-border bg-surface-secondary p-4">
+          <h2 className="mb-3 text-lg font-bold text-text-primary">Summary</h2>
 
-          <dl className="space-y-2 text-sm">
+          <dl className="space-y-2 text-sm text-text-primary">
             <div className="flex justify-between">
-              <dt className="text-gray-600 dark:text-gray-400">Items</dt>
+              <dt className="text-text-secondary">Items</dt>
               <dd>{totalQuantity}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-gray-600 dark:text-gray-400">Subtotal</dt>
+              <dt className="text-text-secondary">Subtotal</dt>
               <dd>{formatPrice(subtotal)}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-gray-600 dark:text-gray-400">Shipping</dt>
+              <dt className="text-text-secondary">Shipping</dt>
               <dd>{shippingCost === 0 ? 'Free' : formatPrice(shippingCost)}</dd>
             </div>
-            <div className="flex justify-between border-t border-gray-200 pt-2 text-base font-bold dark:border-gray-600">
+            <div className="flex justify-between border-t border-border pt-2 text-base font-bold">
               <dt>Total</dt>
               <dd>{formatPrice(total)}</dd>
             </div>
           </dl>
 
           {shippingCost > 0 && (
-            <p className="mt-3 text-xs text-gray-600 dark:text-gray-400">
+            <p className="mt-3 text-xs text-text-secondary">
               Add {formatPrice(remainingForFree)} more for free shipping.
             </p>
           )}
@@ -176,7 +177,7 @@ function CartPage() {
           <button
             type="button"
             onClick={() => navigate('/checkout')}
-            className="mt-4 w-full rounded-lg bg-[#3b4d3c] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#2f3e30] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b4d3c]"
+            className="mt-4 min-h-11 w-full rounded-lg bg-brand px-4 py-3 font-semibold text-text-primary transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
             Proceed to checkout
           </button>

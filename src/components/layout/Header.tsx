@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 
@@ -22,7 +23,7 @@ function Header() {
   const cartBadge = totalQuantity > 0 && (
     <span
       aria-label={`${totalQuantity} items in cart`}
-      className="ml-1.5 rounded-full bg-[#3b4d3c] px-1.5 py-0.5 text-xs font-semibold text-white dark:bg-[#a8e6cf] dark:text-[#3b4d3c]"
+      className="ml-1.5 rounded-full bg-brand-dark px-1.5 py-0.5 text-xs font-semibold text-white"
     >
       {totalQuantity}
     </span>
@@ -39,15 +40,16 @@ function Header() {
   }, [isDark])
 
   const linkClass =
-    'flex min-h-[44px] items-center px-2 text-[#3b4d3c] dark:text-[#a8e6cf] transition-colors hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600'
+    'flex min-h-[44px] items-center px-2 text-text-primary transition-colors hover:text-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark'
 
-  const mobileLinkClass =
-    'flex min-h-[44px] items-center px-2 text-[#3b4d3c] dark:text-[#a8e6cf] transition-colors hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600'
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    `${linkClass} ${isActive ? 'font-bold underline underline-offset-4 decoration-brand-dark' : ''}`
 
   const themeToggle = (
     <button
+      type="button"
       onClick={() => setIsDark(!isDark)}
-      className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2 text-[#3b4d3c] dark:text-[#a8e6cf] transition-colors hover:bg-emerald-900/10 dark:hover:bg-emerald-100/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+      className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2 text-text-primary transition-colors hover:bg-surface-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark"
       aria-label="Toggle theme"
     >
       {isDark ? (
@@ -63,15 +65,16 @@ function Header() {
   )
 
   return (
-    <header className="relative border-b border-emerald-900/10 bg-[#a8e6cf] px-4 py-3 shadow-sm transition-colors dark:border-emerald-500/20 dark:bg-[#3b4d3c] sm:px-6">
+    <header className="relative z-40 border-b border-border bg-surface px-4 py-3 shadow-sm transition-colors sm:px-6">
       <nav className="flex items-center justify-between">
-        <Link to="/" className="flex items-center">
+        <Link to="/" aria-label="10X Shop, go to catalog" className="flex items-center">
           <svg
             version="1.0"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1024.000000 1024.000000"
             preserveAspectRatio="xMidYMid meet"
-            className="h-10 w-auto fill-current text-[#3b4d3c] dark:text-[#a8e6cf] transition-colors sm:h-12"
+            aria-hidden="true"
+            className="h-10 w-auto fill-current text-brand-dark transition-colors sm:h-12"
           >
             <g transform="translate(0.000000,1024.000000) scale(0.100000,-0.100000)" stroke="none">
               <path d="M6775 7444 c-38 -7 -211 -39 -383 -71 l-313 -57 123 -123 123 -123 -1145 -1145 -1145 -1145 1098 0 1097 0 0 115 0 115 -809 2 -809 3 938 945 938 945 124 -122 123 -123 69 383 c37 210 70 390 73 400 5 20 -3 20 -102 1z"/>
@@ -92,12 +95,12 @@ function Header() {
         </Link>
 
         <div className="hidden items-center gap-2 text-sm font-medium sm:flex sm:gap-4 sm:text-base">
-          <Link to="/" className={linkClass}>Catalog</Link>
-          <Link to="/cart" className={linkClass}>Cart{cartBadge}</Link>
+          <NavLink to="/" end className={navLinkClass}>Catalog</NavLink>
+          <NavLink to="/cart" className={navLinkClass}>Cart{cartBadge}</NavLink>
           {isLoggedIn ? (
             <button type="button" onClick={handleLogout} className={linkClass}>Log out</button>
           ) : (
-            <Link to="/login" className={linkClass}>Log in</Link>
+            <NavLink to="/login" className={navLinkClass}>Log in</NavLink>
           )}
           {themeToggle}
         </div>
@@ -106,9 +109,11 @@ function Header() {
           {themeToggle}
 
           <button
+            type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center p-2 text-[#3b4d3c] dark:text-[#a8e6cf] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2 text-text-primary transition-colors hover:bg-surface-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark"
             aria-label="Toggle menu"
+            aria-expanded={isOpen}
           >
             {isOpen ? (
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,13 +134,13 @@ function Header() {
       </nav>
 
       {isOpen && (
-        <div className="absolute left-0 top-full z-50 flex w-full flex-col border-b border-emerald-900/10 bg-[#a8e6cf] px-6 py-4 shadow-md dark:border-emerald-500/20 dark:bg-[#3b4d3c] sm:hidden">
-          <Link to="/" onClick={() => setIsOpen(false)} className={mobileLinkClass}>Catalog</Link>
-          <Link to="/cart" onClick={() => setIsOpen(false)} className={mobileLinkClass}>Cart{cartBadge}</Link>
+        <div className="absolute left-0 top-full z-50 flex w-full flex-col border-b border-border bg-surface px-6 py-4 shadow-md sm:hidden">
+          <NavLink to="/" end onClick={() => setIsOpen(false)} className={navLinkClass}>Catalog</NavLink>
+          <NavLink to="/cart" onClick={() => setIsOpen(false)} className={navLinkClass}>Cart{cartBadge}</NavLink>
           {isLoggedIn ? (
-            <button type="button" onClick={handleLogout} className={mobileLinkClass}>Log out</button>
+            <button type="button" onClick={handleLogout} className={linkClass}>Log out</button>
           ) : (
-            <Link to="/login" onClick={() => setIsOpen(false)} className={mobileLinkClass}>Log in</Link>
+            <NavLink to="/login" onClick={() => setIsOpen(false)} className={navLinkClass}>Log in</NavLink>
           )}
         </div>
       )}

@@ -1,3 +1,4 @@
+
 import {
   useEffect,
   useRef,
@@ -8,6 +9,7 @@ import {
 } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import Toast from '../components/ui/Toast'
 import type { Order, ShippingInfo } from '../types/order'
 import { discountedPrice, formatPrice } from '../utils/format'
 import { getNextOrderNumber, getShippingCost, saveOrder } from '../utils/orders'
@@ -61,18 +63,18 @@ function Field({
 }: FieldProps) {
   const id = `checkout-${name}`
   const errorId = `${id}-error`
-  
-  const className = `min-h-[38px] w-full rounded-md border bg-white px-3 py-1.5 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-emerald-500/40 dark:bg-[#1b2e23] ${
+
+  const className = `min-h-11 w-full rounded-md border bg-surface px-3 py-1.5 text-sm text-text-primary outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/40 ${
     error
-      ? 'border-red-500'
-      : 'border-emerald-700/60 hover:border-emerald-800 dark:border-emerald-500/50'
+      ? 'border-error'
+      : 'border-border hover:border-brand-dark'
   }`
 
   return (
     <div>
       <label
         htmlFor={id}
-        className="mb-1.5 inline-block pb-0.5 text-xs font-semibold uppercase tracking-wider text-emerald-900 border-b-2 border-emerald-700/80 dark:text-emerald-300 dark:border-emerald-500/70"
+        className="mb-1.5 inline-block border-b-2 border-brand pb-0.5 text-xs font-semibold uppercase tracking-wider text-text-primary"
       >
         {label}
       </label>
@@ -111,7 +113,7 @@ function Field({
       )}
 
       {error && (
-        <p id={errorId} className="mt-1 text-xs text-red-600 dark:text-red-400">
+        <p id={errorId} className="mt-1 text-xs text-error">
           {error}
         </p>
       )}
@@ -213,42 +215,31 @@ function CheckoutPage() {
         return
       }
 
-      showToast('Payment successful! Your order has been placed.', 'success')
+      showToast('Order placed ✓', 'success')
       setPlacedOrder(order)
       clearCart()
       setPlacing(false)
     }, 600)
   }
 
+  const toastView = toast && (
+    <Toast key={toast.id} message={toast.text} ok={toast.type === 'success'} />
+  )
+
   if (placedOrder) {
     return (
-      <section className="container mx-auto max-w-2xl px-4 py-10 relative">
-        {toast && (
-          <div
-            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-lg px-5 py-3 text-sm font-medium text-white shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 ${
-              toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'
-            }`}
-          >
-            <span>{toast.text}</span>
-            <button
-              onClick={() => setToast(null)}
-              className="ml-2 rounded p-1 text-white/80 hover:bg-black/10 hover:text-white transition-colors"
-              aria-label="Close notification"
-            >
-              ✕
-            </button>
-          </div>
-        )}
+      <section className="container relative mx-auto max-w-2xl px-4 py-10">
+        {toastView}
         <div
           role="status"
-          className="rounded-lg border border-emerald-600/30 bg-emerald-50 p-6 dark:bg-[#243629]"
+          className="rounded-lg border border-brand/40 bg-surface-secondary p-6 text-text-primary"
         >
           <h1 className="text-2xl font-bold">Thank you! Your order has been placed.</h1>
-          <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-            Order <span className="font-semibold">#{placedOrder.number}</span>
+          <p className="mt-2 text-sm text-text-secondary">
+            Order <span className="font-semibold text-text-primary">#{placedOrder.number}</span>
           </p>
 
-          <ul className="mt-4 space-y-1 border-t border-emerald-600/20 pt-4 text-sm">
+          <ul className="mt-4 space-y-1 border-t border-border pt-4 text-sm">
             {placedOrder.items.map((item) => (
               <li key={item.productId} className="flex justify-between gap-4">
                 <span>
@@ -263,14 +254,16 @@ function CheckoutPage() {
             ))}
           </ul>
 
-          <dl className="mt-4 space-y-1 border-t border-emerald-600/20 pt-4 text-sm">
+          <dl className="mt-4 space-y-1 border-t border-border pt-4 text-sm">
             <div className="flex justify-between">
               <dt>Subtotal</dt>
               <dd>{formatPrice(placedOrder.subtotal)}</dd>
             </div>
             <div className="flex justify-between">
               <dt>Shipping</dt>
-              <dd>{placedOrder.shippingCost === 0 ? 'Free' : formatPrice(placedOrder.shippingCost)}</dd>
+              <dd>
+                {placedOrder.shippingCost === 0 ? 'Free' : formatPrice(placedOrder.shippingCost)}
+              </dd>
             </div>
             <div className="flex justify-between text-base font-bold">
               <dt>Total</dt>
@@ -278,8 +271,8 @@ function CheckoutPage() {
             </div>
           </dl>
 
-          <div className="mt-4 border-t border-emerald-600/20 pt-4 text-sm text-gray-700 dark:text-gray-300">
-            <p className="font-medium">Shipping to</p>
+          <div className="mt-4 border-t border-border pt-4 text-sm text-text-secondary">
+            <p className="font-medium text-text-primary">Shipping to</p>
             <p>{placedOrder.shipping.fullName}</p>
             <p>
               {placedOrder.shipping.address}, {placedOrder.shipping.city},{' '}
@@ -290,7 +283,7 @@ function CheckoutPage() {
 
           <Link
             to="/"
-            className="mt-6 inline-block rounded-lg bg-[#3b4d3c] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#2f3e30] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b4d3c]"
+            className="mt-6 inline-flex min-h-11 items-center rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
             Continue shopping
           </Link>
@@ -304,30 +297,15 @@ function CheckoutPage() {
   }
 
   return (
-    <section className="container mx-auto px-4 py-6 relative">
-      {toast && (
-        <div
-          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-lg px-5 py-3 text-sm font-medium text-white shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 ${
-            toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'
-          }`}
-        >
-          <span>{toast.text}</span>
-          <button
-            onClick={() => setToast(null)}
-            className="ml-2 rounded p-1 text-white/80 hover:bg-black/10 hover:text-white transition-colors"
-            aria-label="Close notification"
-          >
-            ✕
-          </button>
-        </div>
-      )}
+    <section className="container relative mx-auto px-4 py-6">
+      {toastView}
 
-      <h1 className="mb-6 text-2xl font-bold">Checkout</h1>
+      <h1 className="mb-6 text-2xl font-bold text-text-primary">Checkout</h1>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
         <form id="checkout-form" onSubmit={handleSubmit} noValidate className="space-y-6">
           <fieldset className="space-y-4">
-            <legend className="mb-2 text-lg font-bold">Contact</legend>
+            <legend className="mb-2 text-lg font-bold text-text-primary">Contact</legend>
 
             <Field
               label="Full name"
@@ -361,7 +339,7 @@ function CheckoutPage() {
           </fieldset>
 
           <fieldset className="space-y-4">
-            <legend className="mb-2 text-lg font-bold">Shipping address</legend>
+            <legend className="mb-2 text-lg font-bold text-text-primary">Shipping address</legend>
 
             <Field
               label="Address"
@@ -407,10 +385,10 @@ function CheckoutPage() {
           </fieldset>
         </form>
 
-        <aside className="h-fit rounded-lg border border-gray-200 bg-emerald-50 p-4 dark:border-emerald-500/20 dark:bg-[#243629]">
-          <h2 className="mb-3 text-lg font-bold">Order summary</h2>
+        <aside className="h-fit rounded-lg border border-border bg-surface-secondary p-4">
+          <h2 className="mb-3 text-lg font-bold text-text-primary">Order summary</h2>
 
-          <ul className="space-y-2 text-sm">
+          <ul className="space-y-2 text-sm text-text-primary">
             {items.map((item) => (
               <li key={item.productId} className="flex justify-between gap-3">
                 <span className="min-w-0 truncate">
@@ -425,23 +403,23 @@ function CheckoutPage() {
             ))}
           </ul>
 
-          <dl className="mt-3 space-y-2 border-t border-gray-200 pt-3 text-sm dark:border-gray-600">
+          <dl className="mt-3 space-y-2 border-t border-border pt-3 text-sm">
             <div className="flex justify-between">
-              <dt className="text-gray-600 dark:text-gray-400">Subtotal</dt>
+              <dt className="text-text-secondary">Subtotal</dt>
               <dd>{formatPrice(subtotal)}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-gray-600 dark:text-gray-400">Shipping</dt>
+              <dt className="text-text-secondary">Shipping</dt>
               <dd>{shippingCost === 0 ? 'Free' : formatPrice(shippingCost)}</dd>
             </div>
-            <div className="flex justify-between border-t border-gray-200 pt-2 text-base font-bold dark:border-gray-600">
+            <div className="flex justify-between border-t border-border pt-2 text-base font-bold">
               <dt>Total</dt>
               <dd>{formatPrice(total)}</dd>
             </div>
           </dl>
 
           {submitError && (
-            <p role="alert" className="mt-3 text-sm text-red-600 dark:text-red-400">
+            <p role="alert" className="mt-3 text-sm text-error">
               {submitError}
             </p>
           )}
@@ -450,7 +428,7 @@ function CheckoutPage() {
             type="submit"
             form="checkout-form"
             disabled={placing}
-            className="mt-4 w-full rounded-lg bg-[#3b4d3c] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#2f3e30] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b4d3c] disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
+            className="mt-4 min-h-11 w-full rounded-lg bg-brand px-4 py-3 font-semibold text-text-primary transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:bg-surface-secondary disabled:text-text-secondary"
           >
             {placing ? 'Placing order...' : 'Place order'}
           </button>

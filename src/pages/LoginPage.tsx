@@ -1,3 +1,4 @@
+
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -24,16 +25,20 @@ function validateLogin(username: string, password: string): LoginErrors {
 }
 
 function getRedirectPath(state: unknown): string {
-  if (typeof state === 'object' && state !== null && 'from' in state) {
-    const from = (state as { from: unknown }).from
-    if (typeof from === 'string') return from
+  if (
+    typeof state === 'object' &&
+    state !== null &&
+    'from' in state &&
+    typeof state.from === 'string'
+  ) {
+    return state.from
   }
   return '/'
 }
 
 const inputClass = (hasError: boolean) =>
-  `min-h-[44px] w-full rounded-lg border bg-white px-3 py-2 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-emerald-500/40 dark:bg-[#1b2e23] ${
-    hasError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+  `min-h-[44px] w-full rounded-lg border bg-surface px-3 py-2 text-sm text-text-primary outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/40 ${
+    hasError ? 'border-error' : 'border-border hover:border-brand-dark'
   }`
 
 function LoginPage() {
@@ -62,15 +67,15 @@ function LoginPage() {
 
   return (
     <section className="container mx-auto max-w-sm px-4 py-10">
-      <h1 className="mb-6 text-center text-2xl font-bold">Log in</h1>
+      <h1 className="mb-6 text-center text-2xl font-bold text-text-primary">Log in</h1>
 
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="space-y-4 rounded-lg border border-gray-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-[#243629]"
+        className="space-y-4 rounded-lg border border-border bg-surface-secondary p-5"
       >
         <div>
-          <label htmlFor="login-username" className="mb-1 block text-sm font-medium">
+          <label htmlFor="login-username" className="mb-1 block text-sm font-medium text-text-primary">
             Username
           </label>
           <input
@@ -86,14 +91,14 @@ function LoginPage() {
             className={inputClass(!!usernameError)}
           />
           {usernameError && (
-            <p id="login-username-error" className="mt-1 text-xs text-red-600 dark:text-red-400">
+            <p id="login-username-error" className="mt-1 text-xs text-error">
               {usernameError}
             </p>
           )}
         </div>
 
         <div>
-          <label htmlFor="login-password" className="mb-1 block text-sm font-medium">
+          <label htmlFor="login-password" className="mb-1 block text-sm font-medium text-text-primary">
             Password
           </label>
           <input
@@ -109,7 +114,7 @@ function LoginPage() {
             className={inputClass(!!passwordError)}
           />
           {passwordError && (
-            <p id="login-password-error" className="mt-1 text-xs text-red-600 dark:text-red-400">
+            <p id="login-password-error" className="mt-1 text-xs text-error">
               {passwordError}
             </p>
           )}
@@ -117,15 +122,18 @@ function LoginPage() {
 
         <button
           type="submit"
-          className="w-full rounded-lg bg-[#3b4d3c] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#2f3e30] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b4d3c]"
+          className="min-h-11 w-full rounded-lg bg-brand px-4 py-3 font-semibold text-text-primary transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
         >
           Log In
         </button>
       </form>
 
       <p className="mt-4 text-center text-sm">
-        <Link to="/" className="text-xl font-medium text-emerald-700 underline dark:text-emerald-400">
-          Back to catalog
+        <Link
+          to="/"
+          className="inline-flex min-h-11 items-center text-base font-medium text-brand-dark underline hover:text-text-primary"
+        >
+          ← Back to catalog
         </Link>
       </p>
     </section>

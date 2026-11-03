@@ -15,7 +15,7 @@ export interface Product {
   discountPercentage: number
   rating: number
   stock: number
-  brand?: string 
+  brand?: string
   thumbnail: string
   images: string[]
   reviews?: Review[]
@@ -34,18 +34,11 @@ export interface Category {
   url: string
 }
 
-
-export type ProductDetails = Product & {
-  description: string
-  brand?: string
+export interface ProductDetails extends Product {
   sku?: string
   tags?: string[]
-  images: string[]
-  rating: number
-  stock: number
   availabilityStatus?: string
   warrantyInformation?: string
   shippingInformation?: string
   returnPolicy?: string
-  reviews?: Review[]
 }

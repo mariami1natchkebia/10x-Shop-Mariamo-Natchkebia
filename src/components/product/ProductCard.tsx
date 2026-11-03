@@ -14,8 +14,8 @@ function ProductCard({ product, onAdd }: ProductCardProps) {
   const lowStock = product.stock > 0 && product.stock <= 5
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-md border border-gray-200 bg-white text-gray-900 shadow-sm transition-shadow hover:shadow-md dark:border-emerald-500/20 dark:bg-[#243629] dark:text-gray-100">
-      <Link to={`/products/${product.id}`} className="block bg-gray-50 dark:bg-[#1b2e23]">
+    <article className="flex flex-col overflow-hidden rounded-md border border-border bg-surface text-text-primary shadow-sm transition-shadow hover:shadow-md">
+      <Link to={`/products/${product.id}`} className="block bg-surface-secondary">
         <img
           src={product.thumbnail}
           alt={product.title}
@@ -27,15 +27,15 @@ function ProductCard({ product, onAdd }: ProductCardProps) {
       </Link>
 
       <div className="flex flex-1 flex-col gap-1.5 p-3">
-        <p className="text-[11px] text-gray-500 dark:text-gray-400">
-          {product.category}
+        <p className="text-xs capitalize text-text-secondary">
+          {product.category.replace(/-/g, ' ')}
           {product.brand ? ` · ${product.brand}` : ''}
         </p>
 
         <h2 className="text-sm font-semibold leading-snug">
           <Link
             to={`/products/${product.id}`}
-            className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b4d3c]"
+            className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
             {product.title}
           </Link>
@@ -45,33 +45,33 @@ function ProductCard({ product, onAdd }: ProductCardProps) {
           <span className="text-base font-bold">{formatPrice(finalPrice)}</span>
           {hasDiscount && (
             <>
-              <span className="text-xs text-gray-500 line-through dark:text-gray-400">
+              <span className="text-xs text-text-secondary line-through">
                 {formatPrice(product.price)}
               </span>
-              <span className="rounded bg-green-100 px-1 py-0.5 text-[10px] font-semibold text-green-800">
+              <span className="rounded bg-accent-pink/20 px-1 py-0.5 text-xs font-semibold text-[#A65F70]">
                 −{Math.round(product.discountPercentage)}%
               </span>
             </>
           )}
         </div>
 
-        <p className="text-xs">★ {product.rating.toFixed(1)}</p>
+        <p className="text-xs text-text-secondary">★ {product.rating.toFixed(1)}</p>
 
         {outOfStock ? (
-          <p className="text-xs font-medium text-red-600 dark:text-red-400">Out of stock</p>
+          <p className="text-xs font-medium text-error">Out of stock</p>
         ) : lowStock ? (
-          <p className="text-xs font-medium text-orange-600 dark:text-orange-400">
+          <p className="text-xs font-medium text-[#9A7737] dark:text-accent-yellow">
             Only {product.stock} left!
           </p>
         ) : (
-          <p className="text-xs font-medium text-green-700 dark:text-green-400">In stock</p>
+          <p className="text-xs font-medium text-success">In stock</p>
         )}
 
         <button
           type="button"
           onClick={() => onAdd(product)}
           disabled={outOfStock}
-          className="mt-auto min-h-[36px] rounded-md bg-[#3b4d3c] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#2f3e30] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b4d3c] disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
+          className="mt-auto min-h-11 rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-text-primary transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:bg-surface-secondary disabled:text-text-secondary"
         >
           {outOfStock ? 'Out of stock' : 'Add to cart'}
         </button>

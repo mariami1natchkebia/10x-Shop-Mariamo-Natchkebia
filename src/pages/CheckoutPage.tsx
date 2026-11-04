@@ -8,7 +8,7 @@ import {
   type FormEvent,
 } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { useCart } from '../context/CartContext'
+import { useCart } from '../context/useCart'
 import Toast from '../components/ui/Toast'
 import type { Order, ShippingInfo } from '../types/order'
 import { discountedPrice, formatPrice } from '../utils/format'

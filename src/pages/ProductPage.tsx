@@ -2,9 +2,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fetchProductById } from '../api/products.api'
-import type { ProductDetails } from '../types/product'
+import type { ProductDetails as ProductDetailsType } from '../types/product'
 import { discountedPrice, formatPrice } from '../utils/format'
-import { useCart } from '../context/CartContext'
+import { useCart } from '../context/useCart'
 import NotFoundPage from './NotFoundPage'
 import Toast from '../components/ui/Toast'
 
@@ -18,31 +18,37 @@ interface Notice {
 
 function ProductPage() {
   const { id } = useParams<{ id: string }>()
+
+  const isValidId = !!id && VALID_ID.test(id)
+
+  if (!isValidId) return <NotFoundPage />
+
+  return <ProductDetails key={id} id={id} />
+}
+
+function ProductDetails({ id }: { id: string }) {
   const { addItem } = useCart()
-  const [product, setProduct] = useState<ProductDetails | null>(null)
+
+  const [product, setProduct] = useState<ProductDetailsType | null>(null)
   const [activeImage, setActiveImage] = useState(0)
   const [qty, setQty] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
 
-  const isValidId = !!id && VALID_ID.test(id)
-
   useEffect(() => {
-    if (!id || !VALID_ID.test(id)) return
     let ignore = false
-    setLoading(true)
-    setError(null)
-    setActiveImage(0)
-    setQty(1)
-    setNotice(null)
 
     fetchProductById(id)
       .then((data) => {
         if (!ignore) setProduct(data)
       })
       .catch((err) => {
-        if (!ignore) setError(err instanceof Error ? err.message : 'Something went wrong')
+        if (!ignore) {
+          setError(
+            err instanceof Error ? err.message : 'Something went wrong',
+          )
+        }
       })
       .finally(() => {
         if (!ignore) setLoading(false)
@@ -55,11 +61,11 @@ function ProductPage() {
 
   useEffect(() => {
     if (!notice) return
+
     const timer = setTimeout(() => setNotice(null), 2500)
+
     return () => clearTimeout(timer)
   }, [notice])
-
-  if (!isValidId) return <NotFoundPage />
 
   if (loading) {
     return (
@@ -80,6 +86,7 @@ function ProductPage() {
         <p role="alert" className="mb-4 text-error">
           {error}
         </p>
+
         <Link
           to="/"
           className="inline-flex min-h-11 items-center text-base font-medium text-brand-dark underline"
@@ -93,14 +100,23 @@ function ProductPage() {
   if (!product) return <NotFoundPage />
 
   const hasDiscount = product.discountPercentage >= 1
-  const finalPrice = discountedPrice(product.price, product.discountPercentage)
+  const finalPrice = discountedPrice(
+    product.price,
+    product.discountPercentage,
+  )
   const inStock = product.stock > 0
 
   function handleAddToCart() {
-    if (!product) return
-    const result = addItem(product, qty)
-    setNotice({ id: Date.now(), text: result.message, ok: result.ok })
-  }
+  if (!product) return
+
+  const result = addItem(product, qty)
+
+  setNotice({
+    id: Date.now(),
+    text: result.message,
+    ok: result.ok,
+  })
+}
 
   return (
     <section className="container mx-auto px-4 py-6">
@@ -130,10 +146,16 @@ function ProductPage() {
                   onClick={() => setActiveImage(i)}
                   aria-label={`Show image ${i + 1}`}
                   className={`h-16 w-16 shrink-0 rounded-xl border-2 bg-surface p-1 ${
-                    i === activeImage ? 'border-brand-dark' : 'border-border'
+                    i === activeImage
+                      ? 'border-brand-dark'
+                      : 'border-border'
                   }`}
                 >
-                  <img src={img} alt="" className="h-full w-full object-contain" />
+                  <img
+                    src={img}
+                    alt=""
+                    className="h-full w-full object-contain"
+                  />
                 </button>
               ))}
             </div>
@@ -145,7 +167,10 @@ function ProductPage() {
             {product.category}
             {product.brand && ` · ${product.brand}`}
           </p>
-          <h1 className="mt-1 text-2xl font-bold text-text-primary">{product.title}</h1>
+
+          <h1 className="mt-1 text-2xl font-bold text-text-primary">
+            {product.title}
+          </h1>
 
           <p className="mt-2 flex items-center gap-1.5 text-sm text-text-secondary">
             <StarIcon />
@@ -153,10 +178,16 @@ function ProductPage() {
           </p>
 
           <div className="mt-4 flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-text-primary">{formatPrice(finalPrice)}</span>
+            <span className="text-3xl font-bold text-text-primary">
+              {formatPrice(finalPrice)}
+            </span>
+
             {hasDiscount && (
               <>
-                <span className="text-text-secondary line-through">{formatPrice(product.price)}</span>
+                <span className="text-text-secondary line-through">
+                  {formatPrice(product.price)}
+                </span>
+
                 <span className="rounded-md bg-accent-pink/20 px-2 py-0.5 text-sm font-semibold text-[#A65F70]">
                   −{Math.round(product.discountPercentage)}%
                 </span>
@@ -173,10 +204,16 @@ function ProductPage() {
                   : 'text-success'
             }`}
           >
-            {!inStock ? 'Out of stock' : product.stock <= 5 ? `Only ${product.stock} left!` : 'In stock'}
+            {!inStock
+              ? 'Out of stock'
+              : product.stock <= 5
+                ? `Only ${product.stock} left!`
+                : 'In stock'}
           </p>
 
-          <p className="mt-4 text-text-secondary">{product.description}</p>
+          <p className="mt-4 text-text-secondary">
+            {product.description}
+          </p>
 
           <div className="mt-6 flex items-center gap-3">
             <button
@@ -188,9 +225,14 @@ function ProductPage() {
             >
               −
             </button>
-            <span className="w-8 text-center font-semibold text-text-primary" aria-live="polite">
+
+            <span
+              className="w-8 text-center font-semibold text-text-primary"
+              aria-live="polite"
+            >
               {qty}
             </span>
+
             <button
               type="button"
               onClick={() => setQty((q) => Math.min(product.stock, q + 1))}
@@ -212,17 +254,31 @@ function ProductPage() {
           </button>
 
           <dl className="mt-8 space-y-2 border-t border-border pt-4 text-sm">
-            {product.sku && <Row label="SKU" value={product.sku} />}
-            {product.warrantyInformation && <Row label="Warranty" value={product.warrantyInformation} />}
-            {product.shippingInformation && <Row label="Shipping" value={product.shippingInformation} />}
-            {product.returnPolicy && <Row label="Returns" value={product.returnPolicy} />}
+            {product.sku && (
+              <Row label="SKU" value={product.sku} />
+            )}
+
+            {product.warrantyInformation && (
+              <Row label="Warranty" value={product.warrantyInformation} />
+            )}
+
+            {product.shippingInformation && (
+              <Row label="Shipping" value={product.shippingInformation} />
+            )}
+
+            {product.returnPolicy && (
+              <Row label="Returns" value={product.returnPolicy} />
+            )}
           </dl>
         </div>
       </div>
 
       {product.reviews && product.reviews.length > 0 && (
         <div className="mt-12">
-          <h2 className="mb-4 text-xl font-bold text-text-primary">Reviews ({product.reviews.length})</h2>
+          <h2 className="mb-4 text-xl font-bold text-text-primary">
+            Reviews ({product.reviews.length})
+          </h2>
+
           <ul className="space-y-3">
             {product.reviews.map((r) => (
               <li
@@ -230,7 +286,10 @@ function ProductPage() {
                 className="rounded-2xl border border-border bg-surface p-4 shadow-sm"
               >
                 <div className="flex justify-between text-sm">
-                  <span className="font-semibold text-text-primary">{r.reviewerName}</span>
+                  <span className="font-semibold text-text-primary">
+                    {r.reviewerName}
+                  </span>
+
                   <span
                     role="img"
                     aria-label={`${r.rating} out of 5`}
@@ -241,14 +300,23 @@ function ProductPage() {
                     ))}
                   </span>
                 </div>
-                <p className="mt-1 text-sm text-text-secondary">{r.comment}</p>
+
+                <p className="mt-1 text-sm text-text-secondary">
+                  {r.comment}
+                </p>
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {notice && <Toast key={notice.id} message={notice.text} ok={notice.ok} />}
+      {notice && (
+        <Toast
+          key={notice.id}
+          message={notice.text}
+          ok={notice.ok}
+        />
+      )}
     </section>
   )
 }
@@ -256,7 +324,9 @@ function ProductPage() {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex gap-2">
-      <dt className="w-24 shrink-0 font-medium text-text-secondary">{label}</dt>
+      <dt className="w-24 shrink-0 font-medium text-text-secondary">
+        {label}
+      </dt>
       <dd className="text-text-primary">{value}</dd>
     </div>
   )

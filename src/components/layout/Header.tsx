@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
-import { useCart } from '../../context/CartContext'
+import { useAuth } from '../../context/useAuth'
+import { useCart } from '../../context/useCart'
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false)

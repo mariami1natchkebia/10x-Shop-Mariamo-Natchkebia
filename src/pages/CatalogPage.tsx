@@ -1,10 +1,14 @@
 
 import { useEffect, useState } from 'react'
-import { fetchProducts, fetchCategories, fetchProductsByCategory } from '../api/products.api'
+import {
+  fetchProducts,
+  fetchCategories,
+  fetchProductsByCategory,
+} from '../api/products.api'
 import ProductGrid from '../components/product/ProductGrid'
 import CategorySelect from '../components/ui/CategorySelect'
 import Toast from '../components/ui/Toast'
-import { useCart } from '../context/CartContext'
+import { useCart } from '../context/useCart'
 import type { Product, Category } from '../types/product'
 
 interface Notice {
@@ -17,7 +21,7 @@ function CatalogPage() {
   const { addItem } = useCart()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
-  const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [selectedCategory, setSelectedCategory] = useState('')
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -31,8 +35,6 @@ function CatalogPage() {
 
   useEffect(() => {
     let ignore = false
-    setLoading(true)
-    setError(null)
 
     const fetchCall = selectedCategory
       ? fetchProductsByCategory(selectedCategory, 12, 0)
@@ -47,7 +49,9 @@ function CatalogPage() {
       })
       .catch((err) => {
         if (!ignore) {
-          setError(err instanceof Error ? err.message : 'Something went wrong')
+          setError(
+            err instanceof Error ? err.message : 'Something went wrong',
+          )
         }
       })
       .finally(() => {
@@ -63,25 +67,40 @@ function CatalogPage() {
 
   useEffect(() => {
     if (!notice) return
+
     const timer = setTimeout(() => setNotice(null), 2500)
+
     return () => clearTimeout(timer)
   }, [notice])
 
+  function handleCategoryChange(category: string) {
+    setLoading(true)
+    setError(null)
+    setSelectedCategory(category)
+  }
+
   function handleAdd(product: Product) {
     const result = addItem(product, 1)
-    setNotice({ id: Date.now(), text: result.message, ok: result.ok })
+
+    setNotice({
+      id: Date.now(),
+      text: result.message,
+      ok: result.ok,
+    })
   }
 
   return (
     <section className="container mx-auto px-4 py-6">
       <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
-        <h1 className="text-2xl font-bold text-text-primary">Catalog</h1>
+        <h1 className="text-2xl font-bold text-text-primary">
+          Catalog
+        </h1>
 
         <div className="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
           <div className="w-full sm:w-72">
             <CategorySelect
               value={selectedCategory}
-              onChange={setSelectedCategory}
+              onChange={handleCategoryChange}
               categories={categories}
             />
           </div>
@@ -113,10 +132,13 @@ function CatalogPage() {
 
       {!loading && !error && products.length === 0 && (
         <div className="py-12 text-center">
-          <p className="mb-2 text-text-secondary">No products found.</p>
+          <p className="mb-2 text-text-secondary">
+            No products found.
+          </p>
+
           <button
             type="button"
-            onClick={() => setSelectedCategory('')}
+            onClick={() => handleCategoryChange('')}
             className="min-h-11 text-sm font-medium text-brand-dark underline hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
             Clear filters
@@ -128,7 +150,13 @@ function CatalogPage() {
         <ProductGrid products={products} onAdd={handleAdd} />
       )}
 
-      {notice && <Toast key={notice.id} message={notice.text} ok={notice.ok} />}
+      {notice && (
+        <Toast
+          key={notice.id}
+          message={notice.text}
+          ok={notice.ok}
+        />
+      )}
     </section>
   )
 }

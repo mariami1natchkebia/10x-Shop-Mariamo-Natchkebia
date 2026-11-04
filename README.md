@@ -1,3 +1,25 @@
+## Screenshots
+
+### catalog-page
+![catalog-page](./src/assets/catalog-page.png)
+
+### cart-page
+![cart-page](./src/assets/cart-page.png)
+
+### login-page
+![login-page](./src/assets/login-page.png)
+
+### checkout-page
+![checkout-page](./src/assets/checkout-page.png)
+
+### placed-order
+![placed-order](./src/assets/placed-order.png)
+
+### dark-mode
+![dark-mode](./src/assets/same-in-dark-mode.png)
+
+
+
 # 10X Shop — E-Commerce Single Page Application
 
 A modern, highly performant, and fully responsive E-Commerce Single Page Application (SPA) built with React 19, TypeScript (strict mode), Tailwind CSS v4, and integrated with the DummyJSON API. Developed as a diploma project for the 10X Front-end course.
@@ -33,35 +55,52 @@ A modern, highly performant, and fully responsive E-Commerce Single Page Applica
 
 ## 📁 Project Architecture
 src/
-├── api/                  # API request functions (products.api.ts)
-├── components/           # Reusable UI components
-│   ├── layout/           # Header, Footer, Layout, ScrollToTop
-│   ├── product/          # ProductCard, ProductGrid
-│   └── ui/               # CategorySelect, Toast, ErrorBoundary
-├── context/              # Global state management
-│   ├── AuthContext.tsx   # Auth context definition & hook
-│   ├── AuthProvider.tsx  # Auth provider implementation
-│   ├── CartContext.tsx   # Cart context definition & hook
-│   └── CartProvider.tsx  # Cart provider implementation
-├── pages/                # Page route components
-│   ├── CatalogPage.tsx   # Product catalog view
-│   ├── ProductPage.tsx   # Detailed product view
-│   ├── CartPage.tsx      # Shopping cart view
-│   ├── CheckoutPage.tsx # Form validation & order confirmation
-│   ├── LoginPage.tsx    # User login form
-│   └── NotFoundPage.tsx # 404 Error page
-├── routes/               # Routing setup & guards
-├── routes/               # Routing setup & guards
-│   ├── AppRoutes.tsx     # Route declarations
-│   └── ProtectedRoute.tsx# Route guard for auth
-├── types/                # TypeScript interfaces & types
-│   ├── cart.ts           # Cart types
-│   ├── order.ts          # Order & Shipping types
-│   └── product.ts        # Product & Category types
-└── utils/                # Helper utilities
-├── checkoutValidation.ts # Form validation logic
-├── format.ts         # Currency & discount formatters
-└── orders.ts         # Shipping calculation & storage helpers
+├── api/
+│   └── products.api.ts
+│
+├── components/
+│   ├── layout/
+│   │   ├── Header.tsx
+│   │   ├── Footer.tsx
+│   │   ├── Layout.tsx
+│   │   └── ScrollToTop.tsx
+│   │
+│   ├── product/
+│   │   ├── ProductCard.tsx
+│   │   └── ProductGrid.tsx
+│   │
+│   └── ui/
+│       ├── CategorySelect.tsx
+│       ├── Toast.tsx
+│       └── ErrorBoundary.tsx
+│
+├── context/
+│   ├── AuthContext.tsx
+│   ├── AuthProvider.tsx
+│   ├── CartContext.tsx
+│   └── CartProvider.tsx
+│
+├── pages/
+│   ├── CatalogPage.tsx
+│   ├── ProductPage.tsx
+│   ├── CartPage.tsx
+│   ├── CheckoutPage.tsx
+│   ├── LoginPage.tsx
+│   └── NotFoundPage.tsx
+│
+├── routes/
+│   ├── AppRoutes.tsx
+│   └── ProtectedRoute.tsx
+│
+├── types/
+│   ├── cart.ts
+│   ├── order.ts
+│   └── product.ts
+│
+└── utils/
+    ├── checkoutValidation.ts
+    ├── format.ts
+    └── orders.ts
 ---
 
 ## 🧪 Setup & Execution
@@ -71,22 +110,4 @@ src/
    git clone [https://github.com/mariami1nachkebia-5502/10x-shop.git](https://github.com/mariami1nachkebia-5502/10x-shop.git)
    cd 10x-shop
 
-   ## Screenshots
-
-### catalog-page
-![catalog-page](./src/assets/catalog-page.png)
-
-### cart-page
-![cart-page](./src/assets/cart-page.png)
-
-### login-page
-![login-page](./src/assets/login-page.png)
-
-### checkout-page
-![checkout-page](./src/assets/checkout-page.png)
-
-### placed-order
-![placed-order](./src/assets/placed-order.png)
-
-### dark-mode
-![dark-mode](./src/assets/same-in-dark-mode.png)
+   

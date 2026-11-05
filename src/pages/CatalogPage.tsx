@@ -27,6 +27,10 @@ function CatalogPage() {
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
   
+  const [minPrice, setMinPrice] = useState('')
+  const [maxPrice, setMaxPrice] = useState('')
+  const [onlyDiscounted, setOnlyDiscounted] = useState(false)
+  
   const [currentPage, setCurrentPage] = useState(1)
   const limit = 12
   const totalPages = Math.ceil(total / limit) || 1
@@ -49,7 +53,20 @@ function CatalogPage() {
     fetchCall
       .then((data) => {
         if (!ignore) {
-          setProducts(data.products)
+          let filteredProducts = data.products
+
+          if (minPrice !== '') {
+            filteredProducts = filteredProducts.filter((p: Product) => p.price >= Number(minPrice))
+          }
+          if (maxPrice !== '') {
+            filteredProducts = filteredProducts.filter((p: Product) => p.price <= Number(maxPrice))
+          }
+
+          if (onlyDiscounted) {
+            filteredProducts = filteredProducts.filter((p: Product) => (p as any).discountPercentage > 0 || (p as any).discount > 0)
+          }
+
+          setProducts(filteredProducts)
           setTotal(data.total)
         }
       })
@@ -69,7 +86,7 @@ function CatalogPage() {
     return () => {
       ignore = true
     }
-  }, [selectedCategory, currentPage])
+  }, [selectedCategory, currentPage, minPrice, maxPrice, onlyDiscounted])
 
   useEffect(() => {
     if (!notice) return
@@ -83,6 +100,14 @@ function CatalogPage() {
     setSelectedCategory(category)
   }
 
+  function handleClearFilters() {
+    setSelectedCategory('')
+    setMinPrice('')
+    setMaxPrice('')
+    setOnlyDiscounted(false)
+    setCurrentPage(1)
+  }
+
   function handleAdd(product: Product) {
     const result = addItem(product, 1)
     setNotice({
@@ -94,7 +119,6 @@ function CatalogPage() {
 
   return (
     <section className="container mx-auto px-6 py-6">
-      
       <div className="mb-8 flex flex-col items-center justify-between overflow-hidden rounded-3xl bg-surface-secondary p-8 md:flex-row md:p-12">
         <div className="mb-6 max-w-lg md:mb-0">
           <h1 className="mb-4 text-4xl font-bold tracking-tight text-text-primary md:text-5xl">
@@ -119,14 +143,13 @@ function CatalogPage() {
         </div>
       </div>
 
-      
       <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
         <h2 className="text-2xl font-bold text-text-primary">
           Catalog
         </h2>
 
-        <div className="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
-          <div className="w-full sm:w-72">
+        <div className="flex w-full flex-wrap items-center justify-end gap-3">
+          <div className="w-full sm:w-60 rounded-xl bg-surface border border-border shadow-sm">
             <CategorySelect
               value={selectedCategory}
               onChange={handleCategoryChange}
@@ -142,7 +165,47 @@ function CatalogPage() {
         </div>
       </div>
 
-      
+      <div className="mb-8 flex flex-wrap items-center gap-4 rounded-2xl bg-surface p-4 border border-border shadow-sm">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-text-secondary">Price:</span>
+          <input
+            type="number"
+            placeholder="Min"
+            value={minPrice}
+            onChange={(e) => { setMinPrice(e.target.value); setCurrentPage(1); }}
+            className="w-24 rounded-xl border border-border bg-background px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary focus:border-brand focus:outline-none"
+          />
+          <span className="text-text-secondary">-</span>
+          <input
+            type="number"
+            placeholder="Max"
+            value={maxPrice}
+            onChange={(e) => { setMaxPrice(e.target.value); setCurrentPage(1); }}
+            className="w-24 rounded-xl border border-border bg-background px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary focus:border-brand focus:outline-none"
+          />
+        </div>
+
+        <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-text-primary select-none">
+          <input
+            type="checkbox"
+            checked={onlyDiscounted}
+            onChange={(e) => { setOnlyDiscounted(e.target.checked); setCurrentPage(1); }}
+            className="h-4 w-4 rounded border-border text-brand focus:ring-brand accent-brand"
+          />
+          Discounted only
+        </label>
+
+        {(selectedCategory || minPrice || maxPrice || onlyDiscounted) && (
+          <button
+            type="button"
+            onClick={handleClearFilters}
+            className="ml-auto text-sm font-medium text-brand-dark hover:underline"
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
+
       {loading && (
         <div className="flex min-h-[40vh] items-center justify-center">
           <p role="status" className="animate-pulse text-base font-medium text-brand-dark">
@@ -164,7 +227,7 @@ function CatalogPage() {
           </p>
           <button
             type="button"
-            onClick={() => handleCategoryChange('')}
+            onClick={handleClearFilters}
             className="min-h-11 text-sm font-medium text-brand-dark underline hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
             Clear filters
@@ -172,12 +235,10 @@ function CatalogPage() {
         </div>
       )}
 
-      
       {!loading && !error && products.length > 0 && (
         <>
           <ProductGrid products={products} onAdd={handleAdd} />
 
-          
           <div className="mt-10 flex items-center justify-center gap-2 py-4">
             <button
               type="button"
@@ -208,7 +269,7 @@ function CatalogPage() {
               type="button"
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-text-primary hover:border-brand disabled:opacity-40"
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-text-text-primary hover:border-brand disabled:opacity-40"
               aria-label="Next Page"
             >
               →

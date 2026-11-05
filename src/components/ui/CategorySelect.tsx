@@ -70,7 +70,7 @@ function CategorySelect({ value, onChange, categories }: Props) {
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={toggle}
-        className="flex w-full items-center justify-between rounded-lg border-[1.5px] border-[oklch(0.45_0.16_153.68)] bg-emerald-50 px-4 py-2.5 text-sm font-medium text-[oklch(0.54_0.1_176.85)] outline-none transition focus-visible:ring-2 focus-visible:ring-emerald-500/40 dark:bg-[#243629]"
+        className="flex w-full items-center justify-between rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-text-primary outline-none transition focus-visible:ring-2 focus-visible:ring-brand"
       >
         <span className="truncate">{selected.name}</span>
         <svg
@@ -90,8 +90,8 @@ function CategorySelect({ value, onChange, categories }: Props) {
       {open && (
         <ul
           role="listbox"
-          className="absolute left-0 right-0 z-50 mt-2 max-h-72 overflow-y-auto rounded-lg border-[1.5px] border-[oklch(0.45_0.16_153.68)] bg-emerald-50 p-1.5 shadow-lg shadow-emerald-900/10 dark:bg-[#243629]
-            [scrollbar-width:thin] [scrollbar-color:oklch(0.45_0.16_153.68)_transparent]"
+          className="absolute left-0 right-0 z-50 mt-2 max-h-72 overflow-y-auto rounded-xl border border-border bg-surface p-1.5 shadow-lg shadow-black/5 dark:shadow-black/20
+            [scrollbar-width:thin] [scrollbar-color:var(--border)_transparent]"
         >
           {options.map((opt, i) => {
             const isSelected = opt.slug === value
@@ -104,12 +104,12 @@ function CategorySelect({ value, onChange, categories }: Props) {
                 aria-selected={isSelected}
                 onMouseEnter={() => setActiveIndex(i)}
                 onClick={() => choose(opt.slug)}
-                className={`cursor-pointer rounded-md px-3 py-2 text-sm transition-colors ${
+                className={`cursor-pointer rounded-lg px-3 py-2 text-sm transition-colors ${
                   isSelected
-                    ? 'bg-emerald-200 font-semibold text-emerald-900 dark:bg-emerald-800 dark:text-emerald-50'
+                    ? 'bg-brand text-text-primary font-semibold'
                     : isActive
-                      ? 'bg-emerald-100 text-emerald-900 dark:bg-[#2f4a36] dark:text-gray-100'
-                      : 'text-gray-800 dark:text-gray-200'
+                      ? 'bg-surface-secondary text-text-primary'
+                      : 'text-text-primary hover:bg-surface-secondary'
                 }`}
               >
                 {opt.name}

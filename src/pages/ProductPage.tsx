@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fetchProductById } from '../api/products.api'
@@ -7,6 +6,8 @@ import { discountedPrice, formatPrice } from '../utils/format'
 import { useCart } from '../context/useCart'
 import NotFoundPage from './NotFoundPage'
 import Toast from '../components/ui/Toast'
+import networkErrorImage from '../assets/network-error.png'
+
 
 const VALID_ID = /^[1-9]\d*$/
 
@@ -43,13 +44,20 @@ function ProductDetails({ id }: { id: string }) {
       .then((data) => {
         if (!ignore) setProduct(data)
       })
-      .catch((err) => {
-        if (!ignore) {
-          setError(
-            err instanceof Error ? err.message : 'Something went wrong',
-          )
-        }
-      })
+      .catch((err: unknown) => {
+  if (!ignore) {
+    console.error('Failed to load product:', err)
+
+    const errorMessage =
+      err instanceof TypeError
+        ? 'Network error. Please check your connection.'
+        : err instanceof Error
+          ? err.message
+          : 'Something went wrong'
+
+        setError(errorMessage)
+    }
+    })
       .finally(() => {
         if (!ignore) setLoading(false)
       })
@@ -80,22 +88,53 @@ function ProductDetails({ id }: { id: string }) {
     )
   }
 
-  if (error) {
+    if (error) {
     return (
-      <section className="container mx-auto px-4 py-12 text-center">
-        <p role="alert" className="mb-4 text-error">
-          {error}
-        </p>
+        <section className="container mx-auto flex min-h-[65vh] items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md rounded-3xl border border-border bg-surface p-8 text-center shadow-sm">
 
-        <Link
-          to="/"
-          className="inline-flex min-h-11 items-center text-base font-medium text-brand-dark underline"
-        >
-          Back to catalog
-        </Link>
-      </section>
+            <img
+  src={networkErrorImage}
+  alt="Network connection error"
+  onError={() => console.error('Network error image failed to load:', networkErrorImage)}
+  className="mx-auto mb-6 h-48 w-full object-contain"
+/>
+
+            <h2 className="mb-3 text-2xl font-bold text-text-primary">
+            Oops! Connection Lost
+            </h2>
+
+            <p className="mb-3 text-sm leading-6 text-text-secondary">
+            We couldn't load the product.
+            Please check your internet connection and try again.
+            </p>
+
+            <p className="mb-7 text-sm text-error">
+            {error}
+            </p>
+
+            <div className="flex flex-col gap-3">
+
+            <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="w-full rounded-xl bg-brand px-6 py-3 font-semibold text-text-primary transition-colors hover:bg-brand-dark"
+            >
+                Try Again
+            </button>
+
+            <Link
+                to="/"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-border px-6 py-3 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-secondary"
+            >
+                Back to catalog
+            </Link>
+
+            </div>
+        </div>
+        </section>
     )
-  }
+    }
 
   if (!product) return <NotFoundPage />
 
@@ -188,7 +227,7 @@ function ProductDetails({ id }: { id: string }) {
                   {formatPrice(product.price)}
                 </span>
 
-                <span className="rounded-md bg-accent-pink/20 px-2 py-0.5 text-sm font-semibold text-[#A65F70]">
+                <span className="rounded-md bg-accent-pink/20 px-2 py-0.5 text-sm font-semibold text-[#B0304F]">
                   −{Math.round(product.discountPercentage)}%
                 </span>
               </>
@@ -200,7 +239,7 @@ function ProductDetails({ id }: { id: string }) {
               !inStock
                 ? 'text-error'
                 : product.stock <= 5
-                  ? 'text-[#9A7737] dark:text-accent-yellow'
+                  ? 'text-[#8A6A2B] dark:text-accent-yellow'
                   : 'text-success'
             }`}
           >

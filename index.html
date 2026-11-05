@@ -4,7 +4,15 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>10x-shop</title>
+    <meta name="description" content="10X Shop - a small online store built with React, TypeScript and Tailwind CSS." />
+    <title>10X Shop</title>
+    <script>
+      try {
+        if (localStorage.getItem('shop_theme') === 'dark') {
+          document.documentElement.classList.add('dark')
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

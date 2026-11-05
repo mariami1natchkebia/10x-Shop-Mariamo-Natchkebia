@@ -48,7 +48,7 @@ function ProductCard({ product, onAdd }: ProductCardProps) {
               <span className="text-xs text-text-secondary line-through">
                 {formatPrice(product.price)}
               </span>
-              <span className="rounded bg-accent-pink/20 px-1 py-0.5 text-xs font-semibold text-[#fc557d]">
+              <span className="rounded bg-accent-pink/20 px-1 py-0.5 text-xs font-semibold text-[#f64771]">
                 −{Math.round(product.discountPercentage)}%
               </span>
             </>
@@ -60,7 +60,7 @@ function ProductCard({ product, onAdd }: ProductCardProps) {
         {outOfStock ? (
           <p className="text-xs font-medium text-error">Out of stock</p>
         ) : lowStock ? (
-          <p className="text-xs font-medium text-[#9A7737] dark:text-accent-yellow">
+          <p className="text-xs font-medium text-[#8A6A2B] dark:text-accent-yellow">
             Only {product.stock} left!
           </p>
         ) : (

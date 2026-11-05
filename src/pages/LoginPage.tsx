@@ -71,6 +71,9 @@ function LoginPage() {
 
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div>
+            <label htmlFor="login-username" className="sr-only">
+              Username
+            </label>
             <input
               id="login-username"
               name="username"
@@ -81,14 +84,20 @@ function LoginPage() {
               onChange={(e) => setUsername(e.target.value)}
               onBlur={() => setTouched((t) => ({ ...t, username: true }))}
               aria-invalid={!!usernameError}
+              aria-describedby={usernameError ? 'login-username-error' : undefined}
               className={inputClass(!!usernameError)}
             />
             {usernameError && (
-              <p className="ml-2 mt-1 text-xs text-error">{usernameError}</p>
+              <p id="login-username-error" className="ml-2 mt-1 text-xs text-error">
+                {usernameError}
+              </p>
             )}
           </div>
 
           <div>
+            <label htmlFor="login-password" className="sr-only">
+              Password
+            </label>
             <input
               id="login-password"
               name="password"
@@ -99,10 +108,13 @@ function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               onBlur={() => setTouched((t) => ({ ...t, password: true }))}
               aria-invalid={!!passwordError}
+              aria-describedby={passwordError ? 'login-password-error' : undefined}
               className={inputClass(!!passwordError)}
             />
             {passwordError && (
-              <p className="ml-2 mt-1 text-xs text-error">{passwordError}</p>
+              <p id="login-password-error" className="ml-2 mt-1 text-xs text-error">
+                {passwordError}
+              </p>
             )}
           </div>
 

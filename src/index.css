@@ -1,4 +1,3 @@
-
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -42,13 +41,13 @@
   --surface-secondary: #EEF1E9;
 
   --text-primary: #354137;
-  --text-secondary: #788176;
+  --text-secondary: #5F685D;
 
   --border: #E3E8DF;
   --border-hover: #C7D1BD;
 
-  --success: #71966F;
-  --error: #ff5050;
+  --success: #4A7248;
+  --error: #C62828;
 
   --shadow-color: 53 65 55;
 }

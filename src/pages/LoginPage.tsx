@@ -1,4 +1,3 @@
-
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
@@ -37,8 +36,8 @@ function getRedirectPath(state: unknown): string {
 }
 
 const inputClass = (hasError: boolean) =>
-  `min-h-[44px] w-full rounded-lg border bg-surface px-3 py-2 text-sm text-text-primary outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/40 ${
-    hasError ? 'border-error' : 'border-border hover:border-brand-dark'
+  `min-h-[48px] w-full rounded-2xl border bg-surface-secondary px-4 py-3 text-sm text-text-primary outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/40 ${
+    hasError ? 'border-error' : 'border-transparent hover:border-border'
   }`
 
 function LoginPage() {
@@ -66,76 +65,64 @@ function LoginPage() {
   }
 
   return (
-    <section className="container mx-auto max-w-sm px-4 py-10">
-      <h1 className="mb-6 text-center text-2xl font-bold text-text-primary">Log in</h1>
+    <section className="flex min-h-[80vh] items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md rounded-3xl bg-surface p-8 shadow-sm border border-border">
+        <h1 className="mb-6 text-center text-3xl font-bold text-text-primary">Login</h1>
 
-      <form
-        onSubmit={handleSubmit}
-        noValidate
-        className="space-y-4 rounded-lg border border-border bg-surface-secondary p-5"
-      >
-        <div>
-          <label htmlFor="login-username" className="mb-1 block text-sm font-medium text-text-primary">
-            Username
-          </label>
-          <input
-            id="login-username"
-            name="username"
-            type="text"
-            autoComplete="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            onBlur={() => setTouched((t) => ({ ...t, username: true }))}
-            aria-invalid={!!usernameError}
-            aria-describedby={usernameError ? 'login-username-error' : undefined}
-            className={inputClass(!!usernameError)}
-          />
-          {usernameError && (
-            <p id="login-username-error" className="mt-1 text-xs text-error">
-              {usernameError}
-            </p>
-          )}
-        </div>
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <div>
+            <input
+              id="login-username"
+              name="username"
+              type="text"
+              placeholder="Email address / Username"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              onBlur={() => setTouched((t) => ({ ...t, username: true }))}
+              aria-invalid={!!usernameError}
+              className={inputClass(!!usernameError)}
+            />
+            {usernameError && (
+              <p className="ml-2 mt-1 text-xs text-error">{usernameError}</p>
+            )}
+          </div>
 
-        <div>
-          <label htmlFor="login-password" className="mb-1 block text-sm font-medium text-text-primary">
-            Password
-          </label>
-          <input
-            id="login-password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onBlur={() => setTouched((t) => ({ ...t, password: true }))}
-            aria-invalid={!!passwordError}
-            aria-describedby={passwordError ? 'login-password-error' : undefined}
-            className={inputClass(!!passwordError)}
-          />
-          {passwordError && (
-            <p id="login-password-error" className="mt-1 text-xs text-error">
-              {passwordError}
-            </p>
-          )}
-        </div>
+          <div>
+            <input
+              id="login-password"
+              name="password"
+              type="password"
+              placeholder="Password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+              aria-invalid={!!passwordError}
+              className={inputClass(!!passwordError)}
+            />
+            {passwordError && (
+              <p className="ml-2 mt-1 text-xs text-error">{passwordError}</p>
+            )}
+          </div>
 
-        <button
-          type="submit"
-          className="min-h-11 w-full rounded-lg bg-brand px-4 py-3 font-semibold text-text-primary transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-        >
-          Log In
-        </button>
-      </form>
+          <button
+            type="submit"
+            className="min-h-[48px] w-full rounded-full bg-brand px-4 py-3 font-semibold text-text-primary transition-colors hover:bg-brand-dark"
+          >
+            Log In
+          </button>
+        </form>
 
-      <p className="mt-4 text-center text-sm">
-        <Link
-          to="/"
-          className="inline-flex min-h-11 items-center text-base font-medium text-brand-dark underline hover:text-text-primary"
-        >
-          ← Back to catalog
-        </Link>
-      </p>
+        <p className="mt-6 text-center text-sm">
+          <Link
+            to="/"
+            className="text-sm font-medium text-brand-dark underline hover:text-text-primary"
+          >
+            Back to catalog
+          </Link>
+        </p>
+      </div>
     </section>
   )
 }

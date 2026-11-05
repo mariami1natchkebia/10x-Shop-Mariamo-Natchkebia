@@ -47,47 +47,52 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items])
 
-  function addItem(product: Product, qty = 1) {
-    if (product.stock === 0) {
-      return { ok: false, message: 'Out of stock' }
-    }
-
-    const existing = items.find((i) => i.productId === product.id)
-    const inCart = existing?.quantity ?? 0
-
-    if (inCart + qty > product.stock) {
-      return {
-        ok: false,
-        message:
-          inCart > 0
-            ? `Only ${product.stock} in stock (you already have ${inCart} in your cart)`
-            : `Only ${product.stock} in stock`,
-      }
-    }
-
-    setItems((prev) =>
-      existing
-        ? prev.map((i) =>
-            i.productId === product.id
-              ? { ...i, quantity: i.quantity + qty }
-              : i,
-          )
-        : [
-            ...prev,
-            {
-              productId: product.id,
-              title: product.title,
-              thumbnail: product.thumbnail,
-              price: product.price,
-              discountPercentage: product.discountPercentage,
-              stock: product.stock,
-              quantity: qty,
-            },
-          ],
-    )
-
-    return { ok: true, message: 'Added to cart ✓' }
+  
+function addItem(product: Product, qty = 1) {
+  if (product.stock === 0) {
+    return { ok: false, message: 'Out of stock' }
   }
+
+  const existingItem = items.find(
+    (item) => item.productId === product.id
+  )
+
+  const quantityInCart = existingItem?.quantity ?? 0
+
+  if (quantityInCart + qty > product.stock) {
+    return {
+      ok: false,
+      message:
+        quantityInCart > 0
+          ? `Only ${product.stock} in stock (you already have ${quantityInCart} in your cart)`
+          : `Only ${product.stock} in stock`,
+    }
+  }
+
+  setItems((prev) =>
+    existingItem
+      ? prev.map((item) =>
+          item.productId === product.id
+            ? { ...item, quantity: item.quantity + qty }
+            : item,
+        )
+      : [
+          ...prev,
+          {
+            productId: product.id,
+            title: product.title,
+            thumbnail: product.thumbnail,
+            price: product.price,
+            discountPercentage: product.discountPercentage,
+            stock: product.stock,
+            quantity: qty,
+          },
+        ],
+  )
+
+  return { ok: true, message: 'Added to cart' }
+}
+
 
   function removeItem(productId: number) {
     setItems((prev) => prev.filter((i) => i.productId !== productId))

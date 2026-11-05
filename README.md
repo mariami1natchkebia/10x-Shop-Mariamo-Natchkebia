@@ -1,25 +1,3 @@
-## Screenshots
-
-### catalog-page
-![catalog-page](./src/assets/catalog-page.png)
-
-### cart-page
-![cart-page](./src/assets/cart-page.png)
-
-### login-page
-![login-page](./src/assets/login-page.png)
-
-### checkout-page
-![checkout-page](./src/assets/checkout-page.png)
-
-### placed-order
-![placed-order](./src/assets/placed-order.png)
-
-### dark-mode
-![dark-mode](./src/assets/same-in-dark-mode.png)
-
-
-
 # 10X Shop — E-Commerce Single Page Application
 
 A modern, highly performant, and fully responsive E-Commerce Single Page Application (SPA) built with React 19, TypeScript (strict mode), Tailwind CSS v4, and integrated with the DummyJSON API. Developed as a diploma project for the 10X Front-end course.

@@ -131,7 +131,7 @@ function LoginPage() {
             to="/"
             className="text-sm font-medium text-brand-dark underline hover:text-text-primary"
           >
-            ← Back to catalog
+            Back to catalog
           </Link>
         </p>
       </div>

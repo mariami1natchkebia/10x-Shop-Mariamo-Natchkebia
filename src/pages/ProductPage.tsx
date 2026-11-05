@@ -109,7 +109,7 @@ function ProductDetails({ id }: { id: string }) {
   function handleAddToCart() {
   if (!product) return
 
-  const result = addItem(product, qty)
+ const result = addItem(product, qty)
 
   setNotice({
     id: Date.now(),
@@ -124,7 +124,7 @@ function ProductDetails({ id }: { id: string }) {
         to="/"
         className="mb-6 inline-flex min-h-11 items-center text-base font-medium text-brand-dark hover:underline"
       >
-        ← Back to catalog
+        Back to catalog
       </Link>
 
       <div className="grid gap-8 md:grid-cols-2">

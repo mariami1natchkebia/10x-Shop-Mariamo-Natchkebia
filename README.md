@@ -88,7 +88,7 @@ Not Found Page (404)
 
 Product Details Page
 
-![Product Details Page](./src/assets/screenshots/products.png.png)
+![Product Details Page](./src/assets/screenshots/products.png)
 
 Proceed To Checkout
 

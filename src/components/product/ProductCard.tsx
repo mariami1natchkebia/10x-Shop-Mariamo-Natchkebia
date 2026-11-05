@@ -48,7 +48,7 @@ function ProductCard({ product, onAdd }: ProductCardProps) {
               <span className="text-xs text-text-secondary line-through">
                 {formatPrice(product.price)}
               </span>
-              <span className="rounded bg-accent-pink/20 px-1 py-0.5 text-xs font-semibold text-[#A65F70]">
+              <span className="rounded bg-accent-pink/20 px-1 py-0.5 text-xs font-semibold text-[#fc557d]">
                 −{Math.round(product.discountPercentage)}%
               </span>
             </>

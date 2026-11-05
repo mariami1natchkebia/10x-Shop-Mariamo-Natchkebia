@@ -63,7 +63,9 @@ function CatalogPage() {
           }
 
           if (onlyDiscounted) {
-            filteredProducts = filteredProducts.filter((p: Product) => (p as any).discountPercentage > 0 || (p as any).discount > 0)
+            filteredProducts = filteredProducts.filter(
+            (product) => product.discountPercentage > 0
+          )
           }
 
           setProducts(filteredProducts)

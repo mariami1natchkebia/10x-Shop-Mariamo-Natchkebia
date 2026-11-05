@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 import heroImage from '../assets/hero-image.jpg'
 import {
@@ -18,14 +17,20 @@ interface Notice {
   ok: boolean
 }
 
+interface CatalogResult {
+  key: string
+  products: Product[]
+  total: number
+  error: string | null
+}
+
+const LIMIT = 12
+
 function CatalogPage() {
   const { addItem } = useCart()
-  const [products, setProducts] = useState<Product[]>([])
+  const [result, setResult] = useState<CatalogResult | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategory, setSelectedCategory] = useState('')
-  const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
 
   const [minPrice, setMinPrice] = useState('')
@@ -33,68 +38,73 @@ function CatalogPage() {
   const [onlyDiscounted, setOnlyDiscounted] = useState(false)
 
   const [currentPage, setCurrentPage] = useState(1)
-  const limit = 12
-  const totalPages = Math.ceil(total / limit) || 1
+
+
+  const requestKey = `${selectedCategory}|${currentPage}`
+  const current = result !== null && result.key === requestKey ? result : null
+  const loading = current === null
+  const error = current?.error ?? null
+  const total = current?.total ?? 0
+  const totalPages = Math.ceil(total / LIMIT) || 1
+
+  const windowStart = Math.max(1, Math.min(currentPage - 2, totalPages - 4))
+  const pageNumbers = Array.from(
+    { length: Math.min(totalPages, 5) },
+    (_, i) => windowStart + i,
+  )
+
+  const products = (current?.products ?? []).filter(
+    (p) =>
+      (minPrice === '' || p.price >= Number(minPrice)) &&
+      (maxPrice === '' || p.price <= Number(maxPrice)) &&
+      (!onlyDiscounted || p.discountPercentage > 0),
+  )
 
   useEffect(() => {
     fetchCategories()
       .then((data) => setCategories(data))
-      .catch((err) => console.error('Failed to load categories', err))
+      .catch((err: unknown) => console.error('Failed to load categories', err))
   }, [])
 
   useEffect(() => {
     let ignore = false
-    setLoading(true)
+    const key = `${selectedCategory}|${currentPage}`
+    const skip = (currentPage - 1) * LIMIT
 
-    const skip = (currentPage - 1) * limit
-    const fetchCall = selectedCategory
-      ? fetchProductsByCategory(selectedCategory, limit, skip)
-      : fetchProducts(limit, skip)
+    const request = selectedCategory
+      ? fetchProductsByCategory(selectedCategory, LIMIT, skip)
+      : fetchProducts(LIMIT, skip)
 
-    fetchCall
+    request
       .then((data) => {
         if (!ignore) {
-          let filteredProducts = data.products
-
-          if (minPrice !== '') {
-            filteredProducts = filteredProducts.filter(
-              (p: Product) => p.price >= Number(minPrice)
-            )
-          }
-
-          if (maxPrice !== '') {
-            filteredProducts = filteredProducts.filter(
-              (p: Product) => p.price <= Number(maxPrice)
-            )
-          }
-
-          if (onlyDiscounted) {
-            filteredProducts = filteredProducts.filter(
-              (product) => product.discountPercentage > 0
-            )
-          }
-
-          setProducts(filteredProducts)
-          setTotal(data.total)
+          setResult({ key, products: data.products, total: data.total, error: null })
         }
       })
-      .catch((err) => {
-        if (!ignore) {
-          setError(
-            err instanceof Error ? err.message : 'Something went wrong'
-          )
-        }
-      })
-      .finally(() => {
-        if (!ignore) {
-          setLoading(false)
-        }
-      })
+      .catch((err: unknown) => {
+  if (!ignore) {
+    console.error('Failed to load products:', err)
+
+    const errorMessage =
+      err instanceof TypeError
+        ? 'Network error. Please check your connection.'
+        : err instanceof Error
+          ? err.message
+          : 'Something went wrong'
+
+        setResult({
+          key,
+          products: [],
+          total: 0,
+          error: errorMessage,
+        })
+      }
+    })
 
     return () => {
       ignore = true
     }
-  }, [selectedCategory, currentPage, minPrice, maxPrice, onlyDiscounted])
+  }, [selectedCategory, currentPage])
 
   useEffect(() => {
     if (!notice) return
@@ -106,8 +116,12 @@ function CatalogPage() {
 
   function handleCategoryChange(category: string) {
     setCurrentPage(1)
-    setError(null)
     setSelectedCategory(category)
+  }
+
+  function goToPage(page: number) {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   function handleClearFilters() {
@@ -154,12 +168,15 @@ function CatalogPage() {
           <img
             src={heroImage}
             alt="Hero Banner Product"
+            width={1200}
+            height={1214}
+            fetchPriority="high"
             className="h-auto w-full rounded-2xl object-cover"
           />
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[18rem_minmax(0,1fr)]">
 
         <aside className="h-fit rounded-2xl border border-border bg-surface p-5 mt-13.5 shadow-sm space-y-6">
           <h3 className="text-lg font-bold text-text-primary">
@@ -301,27 +318,24 @@ function CatalogPage() {
             <>
               <ProductGrid products={products} onAdd={handleAdd} />
 
-              <div className="mt-10 flex items-center justify-center gap-2 py-4">
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-2 py-4">
                 <button
                   type="button"
                   disabled={currentPage === 1}
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
+                  onClick={() => goToPage(Math.max(currentPage - 1, 1))}
                   className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-text-primary hover:border-brand disabled:opacity-40"
                   aria-label="Previous Page"
                 >
                   ←
                 </button>
 
-                {Array.from(
-                  { length: Math.min(totalPages, 10) },
-                  (_, i) => i + 1
-                ).map((page) => (
+                {pageNumbers.map((page) => (
                   <button
                     key={page}
                     type="button"
-                    onClick={() => setCurrentPage(page)}
+                    onClick={() => goToPage(page)}
+                    aria-label={`Page ${page}`}
+                    aria-current={currentPage === page ? 'page' : undefined}
                     className={`flex h-10 w-10 items-center justify-center rounded-lg text-sm font-semibold transition-colors ${
                       currentPage === page
                         ? 'bg-brand text-text-primary'
@@ -335,11 +349,7 @@ function CatalogPage() {
                 <button
                   type="button"
                   disabled={currentPage === totalPages}
-                  onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.min(prev + 1, totalPages)
-                    )
-                  }
+                  onClick={() => goToPage(Math.min(currentPage + 1, totalPages))}
                   className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-text-primary hover:border-brand disabled:opacity-40"
                   aria-label="Next Page"
                 >

@@ -34,9 +34,17 @@ export function loadOrders(): Order[] {
   }
 }
 
+export function roundMoney(amount: number): number {
+  return Math.round(amount * 100) / 100
+}
+
 export function getNextOrderNumber(): string {
-  const next = loadOrders().length + 1
-  return `10X-${String(next).padStart(5, '0')}`
+  const highest = loadOrders().reduce((max, order) => {
+    const n = Number(order.number.replace('10X-', ''))
+    return Number.isFinite(n) ? Math.max(max, n) : max
+  }, 0)
+
+  return `10X-${String(highest + 1).padStart(5, '0')}`
 }
 
 export function saveOrder(order: Order): boolean {

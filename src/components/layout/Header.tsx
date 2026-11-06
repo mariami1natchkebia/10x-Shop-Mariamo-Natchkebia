@@ -32,7 +32,7 @@ function Header() {
   const cartBadge = totalQuantity > 0 && (
     <span
       aria-label={`${totalQuantity} items in cart`}
-      className="ml-1.5 rounded-full bg-brand-dark px-1.5 py-0.5 text-xs font-semibold text-white"
+      className="ml-1.5 rounded-full bg-brand px-1.5 py-0.5 text-xs font-semibold text-[#354137]"
     >
       {totalQuantity}
     </span>

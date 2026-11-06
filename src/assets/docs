@@ -1,0 +1,236 @@
+COMPATIBILITY — 10X Shop
+1. Overview
+
+This document describes responsive layout behavior, browser compatibility, and accessibility testing for the 10X Shop application.
+
+Application: https://10x-shop-mariamo-natchkebia.vercel.app/
+
+The website was evaluated in mobile and desktop configurations. Testing focused on page rendering, navigation, shopping functionality, keyboard interaction, and accessibility standards.
+
+Test environments
+Environment	Viewport
+Mobile	390 × 844
+Desktop	1440 × 900
+Minimum responsive target	375px width
+
+The automated browser suite uses Chromium, Firefox, and WebKit through Playwright. WebKit results represent browser-engine testing rather than a test in the actual Safari application.
+
+2. Responsive Layout
+
+The interface is designed to adapt its layout according to the available screen width.
+
+Breakpoint configuration
+Device category	Screen width	Expected layout
+Mobile	≤ 480px	Single-column content and compact navigation
+Tablet	481–1024px	Two or three content columns
+Desktop	> 1024px	Four-column product layout
+Mobile requirements
+Navigation elements should fit smaller screens and use a collapsible menu.
+Product cards should be displayed in one column.
+Content must remain readable without requiring horizontal scrolling.
+Buttons and interactive controls should provide a touch area of at least 44 × 44px.
+Forms and product information should adjust to the available width.
+Desktop requirements
+The full navigation should remain visible.
+Product listings should use a multi-column grid.
+Images and content should maintain their proportions.
+Shopping controls should remain accessible and properly aligned.
+
+The responsive checks were performed using a 390px mobile viewport and a 1440px desktop viewport. The automated layout suite also checks that document width does not exceed the available viewport width, allowing a 1px tolerance.
+
+Note: A separate automated run at exactly 375px and on a physical mobile device is not included in the supplied test evidence.
+
+3. Browser Compatibility
+
+Cross-browser verification was performed with Playwright using three browser engines:
+
+Chromium
+Firefox
+WebKit
+
+Each engine was tested in desktop and mobile viewport configurations.
+
+## Browser Compatibility Matrix
+
+| Page | Chrome Desktop | Chrome Mobile | Firefox Desktop | Firefox Mobile | WebKit Desktop | WebKit Mobile |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| Home | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Catalog | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Best Deals | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Product Details | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Empty Cart | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Login | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Orders | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Profile | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Not Found | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+Result: All nine pages passed the supplied automated compatibility checks across the six browser-engine and viewport combinations.
+
+The mobile Firefox configuration uses viewport resizing and touch emulation. It does not represent testing on a physical Android device.
+
+Safari-specific and Microsoft Edge application testing were not independently performed. WebKit and Chromium results should not be interpreted as complete verification of those branded browsers.
+
+4. Accessibility Evaluation
+
+Accessibility was assessed using automated axe-core scans and Lighthouse audits.
+
+The implementation was evaluated against WCAG 2.0 and WCAG 2.1 Level A and AA rule sets.
+
+Accessibility requirements
+Area	Expected implementation
+HTML structure	Appropriate semantic elements for page sections
+Images	Alternative text for meaningful images
+Forms	Associated labels and identifiable controls
+Keyboard focus	Visible focus indicators
+Navigation	Interactive elements accessible through keyboard input
+Contrast	Sufficient contrast between foreground and background
+Controls	Descriptive names and accessible interaction states
+Automated accessibility results
+
+axe-core scans covered nine application pages in both light and dark themes. Checkout was additionally included when reached through the keyboard shopping scenario.
+
+No axe violations were recorded in the supplied test results.
+
+Lighthouse accessibility measurements:
+
+Page	Desktop	Mobile
+Catalog	100	100
+Login	100	100
+
+The overall Lighthouse report also shows an accessibility score of 93/100 for the desktop overview.
+
+A perfect Lighthouse score on individual pages does not independently demonstrate full WCAG compliance. Manual assistive-technology testing remains necessary for a complete accessibility assessment.
+
+5. Keyboard Navigation
+
+The primary purchasing journey was tested without using mouse interaction.
+
+Tested navigation sequence
+Open the Catalog page using keyboard navigation.
+Move through the available products using Tab.
+Open a product with Enter.
+Navigate to the Add to Cart control.
+Open the shopping cart.
+Continue to Checkout.
+Navigate to Login when authentication is requested.
+Return to the checkout process.
+Enter the required delivery information.
+Submit the order and reach the confirmation page.
+Keyboard test results
+Browser engine	Desktop	Mobile
+Chromium	✓ PASS	✓ PASS
+Firefox	✓ PASS	✓ PASS
+WebKit	Not verified	Not verified
+
+The WebKit keyboard test was skipped because the automated environment did not consistently move focus through links using its keyboard-navigation mechanism. A separate control test reproduced this behavior with standard HTML elements.
+
+This result is classified as a testing-environment limitation rather than a confirmed application failure. Additional verification in Safari with its keyboard accessibility settings enabled is recommended.
+
+The test does not cover every possible keyboard interaction, including all reverse-navigation paths, dropdown behaviors, and screen-reader announcements.
+
+6. Lighthouse Evaluation
+
+The supplied Lighthouse screenshots show the following overall desktop results:
+
+Category	Score
+Performance	100/100
+Accessibility	93/100
+Best Practices	100/100
+SEO	92/100
+
+The mobile screenshots also show a Best Practices score of 100 and an SEO score of 92.
+
+SEO observation
+
+The SEO audit identified an invalid robots.txt resource, with 22 errors reported by Lighthouse.
+
+This should be investigated because crawler access and indexing configuration can affect how search engines discover website content.
+
+The report does not establish that the website is already indexed or that all search-engine optimization requirements are satisfied.
+
+Lighthouse interpretation
+
+Performance and Best Practices received full scores in the supplied desktop overview. SEO requires additional attention because of the reported robots.txt issue.
+
+These measurements represent the pages and conditions captured during the Lighthouse runs and should not be treated as permanent scores for every route.
+
+7. Automated Test Summary
+
+The supplied Playwright test execution produced the following results:
+
+Test status	Count
+Passed	94
+Failed	0
+Skipped	2
+
+The automated checks included:
+
+Responsive behavior across browser engines.
+Page availability and navigation.
+Product details and cart operations.
+Login and checkout navigation.
+Order confirmation.
+Product discount and sorting behavior.
+URL history during filtering.
+Shopping-cart shipping and promotional calculations.
+Accessibility scans in light and dark themes.
+Keyboard-based shopping interactions.
+
+The test environment used predefined product responses for repeatable results. Consequently, these checks validate the application interface and its tested shopping scenarios, not the reliability of the external product API or every live product image.
+
+8. Evidence and Reports
+
+Testing artifacts are organized under the following directory:
+
+docs/compat/
+
+Location	Contents
+docs/compat/current/	Browser screenshots
+docs/compat/results.json	Automated test and accessibility results
+docs/compat/report/	HTML test report
+docs/compat/artifacts/	Failure-related traces and screenshots
+docs/compat/lighthouse/	Lighthouse HTML and JSON reports
+docs/compat/live-results.json	Separate deployed-site observations, when available
+
+Screenshots are available for the tested desktop and mobile configurations, including light and dark theme examples.
+
+9. Running the Tests
+
+To reproduce the compatibility checks, execute:
+
+bash
+npm run build
+
+node node_modules/@playwright/test/cli.js test \
+  --config=playwright.compat.config.ts
+
+
+To generate Lighthouse reports:
+
+bash
+node scripts/compat-lighthouse.mjs
+
+
+To produce the compatibility report:
+
+bash
+node scripts/compat-report.mjs
+
+
+The local production preview must be available before running the Lighthouse script.
+
+10. Final Assessment
+
+The supplied test evidence demonstrates successful responsive rendering and functional navigation across the tested Chromium, Firefox, and WebKit configurations.
+
+The automated accessibility scans reported no axe violations, while the Catalog and Login pages achieved 100/100 Lighthouse accessibility scores in both viewport modes.
+
+The main outstanding items are:
+
+Investigate and correct the invalid robots.txt configuration.
+Perform an additional check at exactly 375px screen width.
+Verify keyboard navigation in a real Safari environment.
+Perform additional manual accessibility testing with screen readers and assistive technologies.
+Extend verification to physical mobile devices.
+
+Overall, the supplied results indicate strong compatibility and accessibility performance within the tested environments, with the remaining items requiring additional validation.

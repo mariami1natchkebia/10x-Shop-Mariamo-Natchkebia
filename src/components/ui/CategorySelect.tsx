@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import type { Category } from '../../types/product'
@@ -133,7 +132,7 @@ function CategorySelect({ value, onChange, categories }: Props) {
         aria-label="Select product category"
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-controls="category-options"
+        aria-controls={open ? 'category-options' : undefined}
         aria-activedescendant={
           open ? `cat-opt-${activeIndex}` : undefined
         }

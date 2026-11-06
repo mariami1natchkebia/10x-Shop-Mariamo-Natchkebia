@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useEffect, useState, type MouseEvent } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { fetchProductById } from '../api/products.api'
 import type { ProductDetails as ProductDetailsType } from '../types/product'
 import { discountedPrice, formatPrice } from '../utils/format'
@@ -29,6 +29,8 @@ function ProductPage() {
 
 function ProductDetails({ id }: { id: string }) {
   const { addItem } = useCart()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const [product, setProduct] = useState<ProductDetailsType | null>(null)
   const [activeImage, setActiveImage] = useState(0)
@@ -45,19 +47,18 @@ function ProductDetails({ id }: { id: string }) {
         if (!ignore) setProduct(data)
       })
       .catch((err: unknown) => {
-  if (!ignore) {
-    console.error('Failed to load product:', err)
+        if (ignore) return
 
-    const errorMessage =
-      err instanceof TypeError
-        ? 'Network error. Please check your connection.'
-        : err instanceof Error
-          ? err.message
-          : 'Something went wrong'
+        console.error('Failed to load product:', err)
 
-        setError(errorMessage)
-    }
-    })
+        setError(
+          err instanceof TypeError
+            ? 'Network error. Please check your connection.'
+            : err instanceof Error
+              ? err.message
+              : 'Something went wrong',
+        )
+      })
       .finally(() => {
         if (!ignore) setLoading(false)
       })
@@ -157,13 +158,23 @@ function ProductDetails({ id }: { id: string }) {
   })
 }
 
+  // "default" means this is the first entry in the history (e.g. a direct link),
+  // so there is nothing to go back to - fall back to the plain catalog link.
+  function handleBack(e: MouseEvent<HTMLAnchorElement>) {
+    if (location.key !== 'default') {
+      e.preventDefault()
+      navigate(-1)
+    }
+  }
+
   return (
     <section className="container mx-auto px-4 py-6">
       <Link
         to="/"
-        className="mb-6 inline-flex min-h-11 items-center text-base font-medium text-brand-dark hover:underline"
+        onClick={handleBack}
+        className="mb-6 inline-flex min-h-11 items-center text-base font-medium text-brand-dark hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark"
       >
-        Back to catalog
+        ← Back to catalog
       </Link>
 
       <div className="grid gap-8 md:grid-cols-2">
@@ -172,6 +183,9 @@ function ProductDetails({ id }: { id: string }) {
             <img
               src={product.images[activeImage] ?? product.thumbnail}
               alt={product.title}
+              width={600}
+              height={600}
+              fetchPriority="high"
               className="max-h-full max-w-full object-contain"
             />
           </div>
@@ -193,6 +207,9 @@ function ProductDetails({ id }: { id: string }) {
                   <img
                     src={img}
                     alt=""
+                    width={64}
+                    height={64}
+                    loading="lazy"
                     className="h-full w-full object-contain"
                   />
                 </button>
@@ -203,7 +220,7 @@ function ProductDetails({ id }: { id: string }) {
 
         <div>
           <p className="text-sm capitalize text-text-secondary">
-            {product.category}
+            {product.category.replace(/-/g, ' ')}
             {product.brand && ` · ${product.brand}`}
           </p>
 
@@ -227,7 +244,7 @@ function ProductDetails({ id }: { id: string }) {
                   {formatPrice(product.price)}
                 </span>
 
-                <span className="rounded-md bg-accent-pink/20 px-2 py-0.5 text-sm font-semibold text-[#B0304F]">
+                <span className="rounded-md bg-accent-pink/20 px-2 py-0.5 text-sm font-semibold text-[#ff3b6a]">
                   −{Math.round(product.discountPercentage)}%
                 </span>
               </>
@@ -319,9 +336,9 @@ function ProductDetails({ id }: { id: string }) {
           </h2>
 
           <ul className="space-y-3">
-            {product.reviews.map((r) => (
+            {product.reviews.map((r, index) => (
               <li
-                key={`${r.reviewerName}-${r.date}`}
+                key={`${r.reviewerName}-${r.date}-${index}`}
                 className="rounded-2xl border border-border bg-surface p-4 shadow-sm"
               >
                 <div className="flex justify-between text-sm">

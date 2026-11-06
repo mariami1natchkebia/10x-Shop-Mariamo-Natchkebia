@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import heroImage from '../assets/hero-image.jpg'
 import {
   fetchProducts,
@@ -30,15 +31,24 @@ function CatalogPage() {
   const { addItem } = useCart()
   const [result, setResult] = useState<CatalogResult | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
-  const [selectedCategory, setSelectedCategory] = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
   const [notice, setNotice] = useState<Notice | null>(null)
 
   const [minPrice, setMinPrice] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
   const [onlyDiscounted, setOnlyDiscounted] = useState(false)
 
-  const [currentPage, setCurrentPage] = useState(1)
+  // Category and page live in the URL (?category=...&page=2), so refresh,
+  // the Back button and shared links restore the same view.
+  const selectedCategory = searchParams.get('category') ?? ''
+  const currentPage = Math.max(1, Math.floor(Number(searchParams.get('page'))) || 1)
 
+  function updateView(category: string, page: number) {
+    const next = new URLSearchParams()
+    if (category) next.set('category', category)
+    if (page > 1) next.set('page', String(page))
+    setSearchParams(next)
+  }
 
   const requestKey = `${selectedCategory}|${currentPage}`
   const current = result !== null && result.key === requestKey ? result : null
@@ -52,6 +62,9 @@ function CatalogPage() {
     { length: Math.min(totalPages, 5) },
     (_, i) => windowStart + i,
   )
+
+  const filtersActive = minPrice !== '' || maxPrice !== '' || onlyDiscounted
+  const loadedCount = current?.products.length ?? 0
 
   const products = (current?.products ?? []).filter(
     (p) =>
@@ -82,24 +95,19 @@ function CatalogPage() {
         }
       })
       .catch((err: unknown) => {
-  if (!ignore) {
-    console.error('Failed to load products:', err)
+        if (ignore) return
 
-    const errorMessage =
-      err instanceof TypeError
-        ? 'Network error. Please check your connection.'
-        : err instanceof Error
-          ? err.message
-          : 'Something went wrong'
+        console.error('Failed to load products:', err)
 
-        setResult({
-          key,
-          products: [],
-          total: 0,
-          error: errorMessage,
-        })
-      }
-    })
+        const errorMessage =
+          err instanceof TypeError
+            ? 'Network error. Please check your connection.'
+            : err instanceof Error
+              ? err.message
+              : 'Something went wrong'
+
+        setResult({ key, products: [], total: 0, error: errorMessage })
+      })
 
     return () => {
       ignore = true
@@ -115,21 +123,19 @@ function CatalogPage() {
   }, [notice])
 
   function handleCategoryChange(category: string) {
-    setCurrentPage(1)
-    setSelectedCategory(category)
+    updateView(category, 1)
   }
 
   function goToPage(page: number) {
-    setCurrentPage(page)
+    updateView(selectedCategory, page)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   function handleClearFilters() {
-    setSelectedCategory('')
     setMinPrice('')
     setMaxPrice('')
     setOnlyDiscounted(false)
-    setCurrentPage(1)
+    updateView('', 1)
   }
 
   function handleAdd(product: Product) {
@@ -158,7 +164,12 @@ function CatalogPage() {
 
           <button
             type="button"
-            className="inline-flex items-center rounded-xl bg-brand px-6 py-3 font-semibold text-text-primary transition-colors hover:bg-brand-dark"
+            onClick={() =>
+              document
+                .getElementById('catalog')
+                ?.scrollIntoView({ behavior: 'smooth' })
+            }
+            className="inline-flex items-center rounded-xl bg-brand px-6 py-3 font-semibold text-text-primary transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark"
           >
             Shop Now →
           </button>
@@ -176,15 +187,18 @@ function CatalogPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[18rem_minmax(0,1fr)]">
+      <div id="catalog" className="grid scroll-mt-4 grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[18rem_minmax(0,1fr)]">
 
         <aside className="h-fit rounded-2xl border border-border bg-surface p-5 mt-13.5 shadow-sm space-y-6">
-          <h3 className="text-lg font-bold text-text-primary">
+          <h2 className="text-lg font-bold text-text-primary">
             Filters
-          </h3>
+          </h2>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-text-secondary">
+            <label
+              htmlFor="categoryFilter"
+              className="mb-2 block text-sm font-medium text-text-secondary"
+            >
               Category
             </label>
 
@@ -197,10 +211,13 @@ function CatalogPage() {
             </div>
           </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-text-secondary">
+          <div role="group" aria-labelledby="price-range-label">
+            <p
+              id="price-range-label"
+              className="mb-2 block text-sm font-medium text-text-secondary"
+            >
               Price Range
-            </label>
+            </p>
 
             <div className="flex items-center gap-2">
               <input
@@ -214,7 +231,6 @@ function CatalogPage() {
                 value={minPrice}
                 onChange={(e) => {
                   setMinPrice(e.target.value)
-                  setCurrentPage(1)
                 }}
                 className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary focus:border-brand focus:outline-none"
               />
@@ -232,7 +248,6 @@ function CatalogPage() {
                 value={maxPrice}
                 onChange={(e) => {
                   setMaxPrice(e.target.value)
-                  setCurrentPage(1)
                 }}
                 className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary focus:border-brand focus:outline-none"
               />
@@ -248,7 +263,6 @@ function CatalogPage() {
                 checked={onlyDiscounted}
                 onChange={(e) => {
                   setOnlyDiscounted(e.target.checked)
-                  setCurrentPage(1)
                 }}
                 className="h-4 w-4 rounded border-border text-brand focus:ring-brand accent-brand"
               />
@@ -276,7 +290,9 @@ function CatalogPage() {
 
             {!loading && !error && (
               <span className="whitespace-nowrap text-sm font-medium text-text-secondary">
-                Showing {products.length} of {total} products
+                {filtersActive
+                  ? `${products.length} of ${loadedCount} products on this page match`
+                  : `Showing ${products.length} of ${total} products`}
               </span>
             )}
           </div>

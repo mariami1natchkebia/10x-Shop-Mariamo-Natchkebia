@@ -1,47 +1,50 @@
-# 10X Shop — Final Project Report (REPORT.md)
+# 10X Shop – Final Report
 
-## 1. Planned vs. Delivered Checklist
+## 1. Planned vs. delivered
 
-| Module / Scope | Status | Details |
+| Module / scope | Status | Details |
 | :--- | :---: | :--- |
-| **Project Architecture & Vite Setup** | Completed | Modular folder structure, TypeScript strict mode, React Router v7. |
-| **Authentication Flow (CORE)** | Completed | `AuthContext`, controlled login form, route guard (`ProtectedRoute`). |
-| **Catalog & Product Details (CORE)** | Completed | Async fetching via `fetch`, dynamic parameter route `/products/:id`, clean error/loading states. |
-| **Cart & Checkout (CORE)** | Completed | Immutable state updates, stock validation checks, detailed form validation, instant cart reset upon order placement. |
-| **Tailwind CSS v4 Integration** | Completed | Responsive layout (375px mobile to desktop), dark/light mode toggle support, custom design tokens. |
-| **Quality & Error Resilience** | Completed | Global `ErrorBoundary` integration, zero TypeScript errors (`tsc --noEmit`), zero ESLint warnings (`npm run lint`). |
-| **Deployment** | Completed | Live on Vercel with SPA rewrite configuration (`vercel.json`). |
+| Project setup (Vite, React 19, TypeScript, Tailwind v4) | Done | `strict: true` in `tsconfig.app.json` and `tsconfig.node.json`; scripts `dev`, `build`, `preview`, `typecheck`, `lint` |
+| Login (CORE) | Done | Controlled form, validation, `AuthContext`, redirect back to the page the guest came from |
+| Catalog (CORE) | Done | DummyJSON fetch, loading / error / empty states, `ProductCard` + `ProductGrid` (`map` + stable `key`) |
+| Product page (CORE) | Done | `useParams`, gallery, stock states, quantity, Add to cart, 404 for invalid or unknown ids |
+| Cart (CORE) | Done | Add / change quantity / remove / clear, totals, `localStorage` persistence |
+| Checkout (CORE) | Done | Controlled form, validation, local order simulation, "Thank you!" confirmation, cart cleared |
+| Tailwind CSS (CORE) | Done | Utility classes, grid / flex, mobile-first breakpoints, hover / focus / disabled states |
+| Optimization (CORE) | Done | Responsive layout, `ErrorBoundary`, `DEBUG-LOG.md`; hero image reduced from 2.55 MB to 64 KB |
+| Practical project (CORE) | Done | README, PLAN, REPORT, Git history, Vercel deployment with SPA rewrite |
+| FULL extras | Partly | Category filter and pagination (kept in the URL, so Back / refresh restore them), saved orders (`localStorage`), dark / light theme (`@theme` tokens) |
+| Not done | – | Search, sorting, price filters in the URL (only category and page are in the URL), Orders / Profile pages, Reviews write form, Related products, Promo code, Formik + Yup, Lighthouse before / after comparison |
 
-*Note: The CORE requirements were completed efficiently within 8 days of dedicated work ahead of the deadline.*
+## 2. Hardest problems
 
----
-## 2. Key Technical Challenges & Solutions
+1. **Outdated responses overwriting newer ones** (category switching) – solved with an `ignore` flag in the effect cleanup.
+2. **Stale state in the cart** – the add / update decision moved inside `setItems((prev) => ...)`.
+3. **Lint rule `set-state-in-effect`** – `loading` / `error` became values derived from the stored response and its request key instead of separate state set inside the effect.
 
-### Problem 1: Asynchronous State Updates during Data Fetching
-- **Challenge**: Rapid category changes in `CatalogPage` caused potential race conditions where outdated API requests could resolve after newer ones.
-- **Solution**: Implemented an `ignore` flag cleanup pattern inside `useEffect` to invalidate unmounted or outdated promise resolutions.
+Details and commit links: `DEBUG-LOG.md`.
 
-### Problem 2: React Hooks Lint Rule (`set-state-in-effect`)
-- **Challenge**: Upgrading ESLint rules flagged synchronous `setLoading(true)` calls directly inside `useEffect` bodies.
-- **Solution**: Refactored fetch effects to maintain clean execution flow and applied targeted, documented linter overrides (`// eslint-disable-next-line react-hooks/set-state-in-effect`) where synchronous state reset prior to async tasks is structurally required.
+## 3. Metrics
 
-### Problem 3: Fast Refresh Exports in Context Modules
-- **Challenge**: Combining context definitions, custom hooks (`useAuth`, `useCart`), and providers in single files triggered `react-refresh/only-export-components` linting errors.
-- **Solution**: Separated contexts, hooks, and providers into distinct, modular files (`AuthContext.tsx`, `AuthProvider.tsx`, `useAuth.ts`), eliminating fast-refresh warnings and improving codebase maintainability.
+| Metric | Value |
+| :--- | :--- |
+| `npm run typecheck` (strict) | 0 errors |
+| `npm run lint` | 0 errors, 0 warnings |
+| Production bundle | JS 95 kB gzip, CSS 6 kB gzip |
+| Hero image | 2.55 MB → 64 KB |
+| Commits / merged PRs | see `git log` (41 commits and PRs #1–#12 before the final fixes) |
+| Lighthouse (mobile, live URL, Chrome DevTools) | Performance 98 · Accessibility 93 · Best Practices 100 · SEO 92 |
+| Core Web Vitals (same run) | FCP 1.5 s · LCP 2.3 s · TBT 60 ms · CLS 0 · Speed Index 1.5 s |
+| Lighthouse screenshots | `docs/lighthouse/` |
 
----
-## 3. Performance & Quality Metrics
+## 4. What I would do differently
 
-- **TypeScript Compilation**: `npm run typecheck` passes with **0 errors**.
-- **ESLint Code Quality**: `npm run lint` passes with **0 errors / 0 warnings**.
-- **Build Output**: Clean Vite production bundle under target thresholds.
-- **Responsiveness**: Tested and validated across 375px mobile viewports up to 1440px+ desktop screen widths without horizontal overflow.
+- Keep filters, page and category in the URL (`useSearchParams`) so refresh and the Back button work.
+- Do price filtering on the server side of the request (or sort / filter the whole result) so that "Showing X of Y" is accurate.
+- Add a Retry button and skeleton cards, and measure with Lighthouse from the first week rather than at the end.
 
----
+## 5. AI usage
 
-## 4. Reflections & AI Collaboration Summary
-
-During this project, AI was utilized as an intelligent peer reviewer and architectural advisor:
-- **What was delegated**: Initial boilerplate structures, verifying type guard edge cases, and drafting comprehensive Markdown documentation.
-- **What was retained by the developer**: Architectural decisions, component layout design, form validation rule logic, state management structure, and manual testing/debugging.
-- **Key Takeaway**: Strict prioritization of CORE functional requirements first allowed for early completion (8 days), ensuring high stability and comprehensive test coverage prior to final submission.
+- **Delegated:** reviewing the code against the PRD, finding lint and accessibility problems, drafting documentation.
+- **Kept myself:** architecture and folder structure, component design, validation rules, state management decisions, manual testing and debugging.
+- **Rejected / checked:** claims in the first version of this report that did not match the code (strict mode, lint status) were corrected after running `typecheck`, `lint` and `build`.

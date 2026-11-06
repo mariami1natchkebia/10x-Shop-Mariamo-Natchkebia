@@ -1,4 +1,3 @@
-
 import {
   useEffect,
   useRef,
@@ -12,7 +11,12 @@ import { useCart } from '../context/useCart'
 import Toast from '../components/ui/Toast'
 import type { Order, ShippingInfo } from '../types/order'
 import { discountedPrice, formatPrice } from '../utils/format'
-import { getNextOrderNumber, getShippingCost, saveOrder } from '../utils/orders'
+import {
+  getNextOrderNumber,
+  getShippingCost,
+  roundMoney,
+  saveOrder,
+} from '../utils/orders'
 import { validateShipping } from '../utils/checkoutValidation'
 
 const COUNTRIES = [
@@ -200,10 +204,10 @@ function CheckoutPage() {
           postalCode: values.postalCode.trim(),
           country: values.country,
         },
-        subtotal,
+        subtotal: roundMoney(subtotal),
         discount: 0,
         shippingCost,
-        total,
+        total: roundMoney(total),
         placedAt: new Date().toISOString(),
       }
 

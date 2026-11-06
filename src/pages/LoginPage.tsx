@@ -78,7 +78,7 @@ function LoginPage() {
               id="login-username"
               name="username"
               type="text"
-              placeholder="Email address / Username"
+              placeholder="Username"
               autoComplete="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -131,7 +131,7 @@ function LoginPage() {
             to="/"
             className="text-sm font-medium text-brand-dark underline hover:text-text-primary"
           >
-            Back to catalog
+            ← Back to catalog
           </Link>
         </p>
       </div>

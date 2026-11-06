@@ -32,14 +32,14 @@ function ProductCard({ product, onAdd }: ProductCardProps) {
           {product.brand ? ` · ${product.brand}` : ''}
         </p>
 
-        <h2 className="text-sm font-semibold leading-snug">
+        <h3 className="text-sm font-semibold leading-snug">
           <Link
             to={`/products/${product.id}`}
             className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
             {product.title}
           </Link>
-        </h2>
+        </h3>
 
         <div className="flex flex-wrap items-baseline gap-1.5">
           <span className="text-base font-bold">{formatPrice(finalPrice)}</span>
@@ -48,7 +48,7 @@ function ProductCard({ product, onAdd }: ProductCardProps) {
               <span className="text-xs text-text-secondary line-through">
                 {formatPrice(product.price)}
               </span>
-              <span className="rounded bg-accent-pink/20 px-1 py-0.5 text-xs font-semibold text-[#f64771]">
+              <span className="rounded bg-accent-pink/20 px-1 py-0.5 text-xs font-semibold text-[#ff3b6a]">
                 −{Math.round(product.discountPercentage)}%
               </span>
             </>

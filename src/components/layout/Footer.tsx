@@ -1,63 +1,67 @@
-import React from 'react';
+import { useState, type FormEvent } from 'react'
 
 function Footer() {
+  const [subscribed, setSubscribed] = useState(false)
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setSubscribed(true)
+    e.currentTarget.reset()
+  }
+
   return (
-    <footer className="bg-surface text-text-primary border-t border-border py-6 px-6 font-sans transition-colors duration-250">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm">
-        
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-4 text-center md:text-left">
-          <h3 className="tracking-widest font-serif uppercase font-semibold">
+    <footer className="border-t border-border bg-surface px-6 py-6 font-sans text-text-primary transition-colors duration-250">
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 text-sm md:flex-row">
+        <div className="flex flex-col items-center gap-4 text-center md:flex-row md:items-start md:text-left">
+          <h2 className="font-serif font-semibold uppercase tracking-widest">
             10x-shop
-          </h3>
-          <span className="hidden md:inline text-text-secondary">|</span>
-          <p className="text-xs text-text-secondary max-w-xs">
-            Get 10% off your first order. Subscribe for updates.
+          </h2>
+          <span className="hidden text-text-secondary md:inline" aria-hidden="true">|</span>
+          <p className="max-w-xs text-xs text-text-secondary">
+            Subscribe for shop updates.
           </p>
         </div>
 
-        
-        <form
-        onSubmit={(e: React.FormEvent<HTMLFormElement>) => e.preventDefault()}
-        className="flex w-full md:w-auto gap-2 max-w-sm"
-        >
-        <label htmlFor="footer-email" className="sr-only">
-            Your email address
-        </label>
+        <div className="w-full max-w-sm md:w-auto">
+          <form onSubmit={handleSubmit} className="flex w-full gap-2">
+            <label htmlFor="footer-email" className="sr-only">
+              Your email address
+            </label>
 
-        <input
-            id="footer-email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            placeholder="Your email address"
-            aria-label="Your email address"
-            className="bg-background border border-border focus:border-border-hover px-3 py-1.5 text-xs text-text-primary placeholder-text-secondary outline-none w-full rounded-lg"
-        />
+            <input
+              id="footer-email"
+              name="email"
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="Your email address"
+              onChange={() => setSubscribed(false)}
+              className="w-full rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-text-primary outline-none placeholder:text-text-secondary focus:border-border-hover"
+            />
 
-        <button
-            type="submit"
-            className="bg-brand text-[#354137] hover:bg-brand-dark hover:text-white px-4 py-1.5 text-xs tracking-wider uppercase font-medium transition-colors whitespace-nowrap rounded-lg"
-        >
-            Sign Up
-        </button>
-        </form>
+            <button
+              type="submit"
+              className="min-h-11 whitespace-nowrap rounded-lg bg-brand px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-[#354137] transition-colors hover:bg-brand-dark hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark"
+            >
+              Sign Up
+            </button>
+          </form>
 
-
-        <div className="flex flex-col md:flex-row items-center gap-4 text-xs text-text-secondary">
-          <div className="flex items-center gap-3">
-            <p className="hover:text-text-primary transition-colors">Terms</p>
-            <span>•</span>
-            <p className="hover:text-text-primary transition-colors">Privacy</p>
-            <span>•</span>
-            <p className="hover:text-text-primary transition-colors">Refund</p>
-          </div>
-          <span className="hidden md:inline">|</span>
-          <div>© 2026 10x-shop by Maro.</div>
+          {subscribed && (
+            <p role="status" className="mt-2 text-xs text-success">
+              Thanks for subscribing!
+            </p>
+          )}
         </div>
 
+        <div className="flex flex-col items-center gap-4 text-xs text-text-secondary md:flex-row">
+          <p>Terms • Privacy • Refund</p>
+          <span className="hidden md:inline" aria-hidden="true">|</span>
+          <div>© 2026 10x-shop by Maro.</div>
+        </div>
       </div>
     </footer>
-  );
+  )
 }
 
-export default Footer;
+export default Footer

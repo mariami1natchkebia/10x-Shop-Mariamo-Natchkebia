@@ -2,7 +2,7 @@
 
 A responsive online-store SPA built as the individual diploma project of the 10X Front-end course. Products come from the public [DummyJSON](https://dummyjson.com) API; login and checkout are local simulations (no real authentication or payments).
 
-**Live demo:** https://10x-shop-maro.vercel.app
+**Live demo:** [https://10x-shop-maro.vercel.app](https://10x-shop-mariamo-natchkebia.vercel.app/)
 
 ## Features
 
